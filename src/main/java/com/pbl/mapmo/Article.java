@@ -2,11 +2,16 @@ package com.pbl.mapmo;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
 @Table(name = "article")
+@EntityListeners(AuditingEntityListener.class)
 @Getter
 @Setter
 @NoArgsConstructor
@@ -24,20 +29,25 @@ public class Article {
     @Column(columnDefinition = "TEXT")
     private String content;
 
-    @Column(columnDefinition = "INT DEFAULT 0")
+    @Column(nullable = false)
     private Integer views = 0;
 
-    @Column(columnDefinition = "INT DEFAULT 0")
+    @Column(nullable = false)
     private Integer likes = 0;
 
-    @Column(name = "dislike", columnDefinition = "INT DEFAULT 0")
+    @Column(nullable = false)
     private Integer dislikes = 0;
 
     @Column(length = 255)
     private String location;
 
-    @Column(columnDefinition = "DATETIME DEFAULT NULL")
-    private LocalDateTime date;
+    @CreatedDate
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdDate;
+
+    @LastModifiedDate
+    @Column(nullable = false)
+    private LocalDateTime lastModifiedDate;
 
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id", foreignKey = @ForeignKey(name = "article_ibfk_1"))

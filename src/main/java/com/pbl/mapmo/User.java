@@ -17,23 +17,28 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(nullable = false, length = 50)
+    @Column(nullable = false, unique = true)
+    private String email; // 소셜 로그인과 로컬 회원이 같은 email로 가입 못하게 막을 수 있음
+
+    @Column(nullable = true) // 명시적으로 NULL 허용
+    private String password; // 소셜로그인의 경우 password null, DTO로 자체 가입자 구분
+
+    @Column(nullable = false)
     private String name;
 
-    private Integer age;
+    @Column(length = 500)
+    private String profilePic;  // 이미지 URL 저장
 
     @Enumerated(EnumType.STRING)
-    @Column(columnDefinition = "ENUM('남','여','기타')")
+    @Column(nullable = true)
     private Gender sex;
-
-    private String profilePic;
-
-    @Column(name = "is_deleted", columnDefinition = "TINYINT(1) DEFAULT 0")
-    private Boolean isDeleted = false;
 
     public enum Gender {
         남, 여, 기타
     }
+
+    @Column(name = "is_deleted", columnDefinition = "TINYINT(1) DEFAULT 0")
+    private Boolean isDeleted = false;
 
     @OneToMany(mappedBy = "user")
     private List<Schedule> schedules;

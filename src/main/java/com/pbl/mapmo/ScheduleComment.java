@@ -4,10 +4,13 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "comment") // 테이블 이름은 기존과 동일
+@Table(name = "schedule_comment")
+@EntityListeners(AuditingEntityListener.class)
 @Getter
 @Setter
 @NoArgsConstructor
@@ -23,11 +26,11 @@ public class ScheduleComment {
     private String content;
 
     @CreatedDate
-    @Column(columnDefinition = "DATETIME", nullable = false, updatable = false)
+    @Column(nullable = false, updatable = false)
     private LocalDateTime createdDate;
 
     @LastModifiedDate
-    @Column(columnDefinition = "DATETIME", nullable = false)
+    @Column(nullable = false)
     private LocalDateTime lastModifiedDate;
 
     @ManyToOne

@@ -3,6 +3,8 @@ package com.pbl.mapmo;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+
 @Entity
 @Table(name = "shared_schedule")
 @Getter
@@ -16,11 +18,14 @@ public class SharedSchedule {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @ManyToOne
-    @JoinColumn(name = "schedule_id", referencedColumnName = "id", foreignKey = @ForeignKey(name = "shared_schedule_ibfk_1"))
+    @OneToOne
+    @JoinColumn(name = "schedule_id")
     private Schedule schedule;
 
     @ManyToOne
-    @JoinColumn(name = "user_id_master", referencedColumnName = "id", foreignKey = @ForeignKey(name = "shared_schedule_ibfk_2"))
+    @JoinColumn(name = "user_id_master")
     private User userMaster;
+
+    @OneToMany(mappedBy = "sharedSchedule")
+    private List<SharedScheduleMember> sharedMembers;
 }

@@ -3,13 +3,15 @@ package com.pbl.mapmo;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+
 @Entity
 @Table(name = "brand")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
+@ToString(exclude = {"franchises", "events"})
 public class Brand {
 
     @Id
@@ -18,4 +20,10 @@ public class Brand {
 
     @Column(length = 100, nullable = false)
     private String name;
+
+    @OneToMany(mappedBy = "brand")
+    private List<Franchise> franchises;
+
+    @OneToMany(mappedBy = "brand")
+    private List<Event> events;
 }

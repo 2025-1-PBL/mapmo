@@ -18,11 +18,11 @@ public class BlockMember {
 
     // 차단 그룹 (Block)
     @ManyToOne
-    @JoinColumn(name = "block_id", referencedColumnName = "id", foreignKey = @ForeignKey(name = "fk_block_member_block"))
+    @JoinColumn(name = "block_id", nullable = false, referencedColumnName = "id", foreignKey = @ForeignKey(name = "fk_block_member_block"))
     private Block block; // 차단 그룹
 
     // 차단된 사용자 (member)
     @ManyToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "id", foreignKey = @ForeignKey(name = "fk_block_member_user"))
+    @JoinColumn(name = "user_id", nullable = false, referencedColumnName = "id", foreignKey = @ForeignKey(name = "fk_block_member_user"))
     private User user; // 차단된 사용자
 }

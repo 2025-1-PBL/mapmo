@@ -15,13 +15,13 @@ public class SharedScheduleMember {
     @EmbeddedId
     private SharedScheduleMemberId id;
 
-    @ManyToOne
     @MapsId("sharedScheduleId")
-    @JoinColumn(name = "shared_schedule_id", referencedColumnName = "id", foreignKey = @ForeignKey(name = "shared_schedule_member_ibfk_1"))
+    @ManyToOne
+    @JoinColumn(name = "shared_schedule_id")
     private SharedSchedule sharedSchedule;
 
-    @ManyToOne
     @MapsId("userIdMember")
-    @JoinColumn(name = "user_id_member", referencedColumnName = "id", foreignKey = @ForeignKey(name = "shared_schedule_member_ibfk_2"))
+    @ManyToOne
+    @JoinColumn(name = "user_id_member")
     private User userMember;
 }

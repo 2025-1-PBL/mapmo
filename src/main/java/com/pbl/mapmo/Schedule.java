@@ -12,7 +12,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
+@ToString(exclude = {"user", "sharedSchedule"})
 public class Schedule {
 
     @Id
@@ -26,8 +26,8 @@ public class Schedule {
 
     private String location;
 
-    @Column(columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP")
-    private LocalDateTime date;
+    @Column(nullable = false)
+    private LocalDateTime date = LocalDateTime.now();
 
     @Column(name = "is_shared", columnDefinition = "TINYINT(1) DEFAULT 0")
     private Boolean isShared = false;
@@ -36,7 +36,7 @@ public class Schedule {
     @JoinColumn(name = "user_id", referencedColumnName = "id", foreignKey = @ForeignKey(name = "schedule_ibfk_1"))
     private User user;
 
-    @OneToMany(mappedBy = "schedule")
-    private List<SharedSchedule> sharedSchedules;
+    @OneToOne(mappedBy = "schedule")
+    private SharedSchedule sharedSchedule; // 스케줄 하나는 하나의 공유스케줄만 가짐
 }
 
