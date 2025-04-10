@@ -1,4 +1,4 @@
-package com.pbl.mapmo;
+package com.pbl.mapmo.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -8,6 +8,7 @@ import java.util.List;
 @Table(name = "user")
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString

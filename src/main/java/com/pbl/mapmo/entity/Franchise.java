@@ -1,4 +1,4 @@
-package com.pbl.mapmo;
+package com.pbl.mapmo.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -21,6 +21,12 @@ public class Franchise {
 
     @Column(length = 255)
     private String location;
+
+    @Column(precision = 10, scale = 6)
+    private Double latitude;
+
+    @Column(precision = 10, scale = 6)
+    private Double longitude;
 
     // 브랜드와 연결 (ManyToOne 관계)
     @ManyToOne

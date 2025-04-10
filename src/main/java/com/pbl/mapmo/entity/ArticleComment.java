@@ -1,4 +1,4 @@
-package com.pbl.mapmo;
+package com.pbl.mapmo.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -12,6 +12,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @EntityListeners(AuditingEntityListener.class)
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString

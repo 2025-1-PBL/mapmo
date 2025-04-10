@@ -1,15 +1,15 @@
-package com.pbl.mapmo;
+package com.pbl.mapmo.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
 @Table(name = "schedule")
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString(exclude = {"user", "sharedSchedule"})
@@ -24,7 +24,14 @@ public class Schedule {
 
     private String content;
 
+    @Column(length = 255)
     private String location;
+
+    @Column(precision = 10, scale = 6)
+    private Double latitude;
+
+    @Column(precision = 10, scale = 6)
+    private Double longitude;
 
     @Column(nullable = false)
     private LocalDateTime date = LocalDateTime.now();

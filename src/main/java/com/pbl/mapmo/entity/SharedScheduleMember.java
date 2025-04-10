@@ -1,4 +1,4 @@
-package com.pbl.mapmo;
+package com.pbl.mapmo.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
