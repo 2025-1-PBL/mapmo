@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class ArticleDTO {
+public class ArticleDto {
 
     @Getter
     @Setter
@@ -54,8 +54,8 @@ public class ArticleDTO {
         private Double longitude;
         private LocalDateTime createdDate;
         private LocalDateTime lastModifiedDate;
-        private UserDTO.Response user;
-        private List<ArticleCommentDTO.Response> comments;
+        private UserDto.Response user;
+        private List<ArticleCommentDto.Response> comments;
 
         public static Response of(Article article) {
             return Response.builder()
@@ -70,9 +70,9 @@ public class ArticleDTO {
                     .longitude(article.getLongitude())
                     .createdDate(article.getCreatedDate())
                     .lastModifiedDate(article.getLastModifiedDate())
-                    .user(UserDTO.Response.of(article.getUser()))
+                    .user(UserDto.Response.of(article.getUser()))
                     .comments(article.getArticleComments() != null ?
-                            ArticleCommentDTO.Response.of(article.getArticleComments()) : null)
+                            ArticleCommentDto.Response.of(article.getArticleComments()) : null)
                     .build();
         }
 

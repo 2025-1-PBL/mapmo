@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class ScheduleDTO {
+public class ScheduleDto {
 
     @Getter
     @Setter
@@ -56,8 +56,8 @@ public class ScheduleDTO {
         private Double longitude;
         private LocalDateTime date;
         private Boolean isShared;
-        private UserDTO.Response user;
-        private SharedScheduleDTO.Response sharedSchedule;
+        private UserDto.Response user;
+        private SharedScheduleDto.Response sharedSchedule;
 
         public static Response of(Schedule schedule) {
             return Response.builder()
@@ -69,9 +69,9 @@ public class ScheduleDTO {
                     .longitude(schedule.getLongitude())
                     .date(schedule.getDate())
                     .isShared(schedule.getIsShared())
-                    .user(UserDTO.Response.of(schedule.getUser()))
+                    .user(UserDto.Response.of(schedule.getUser()))
                     .sharedSchedule(schedule.getSharedSchedule() != null ?
-                            SharedScheduleDTO.Response.of(schedule.getSharedSchedule()) : null)
+                            SharedScheduleDto.Response.of(schedule.getSharedSchedule()) : null)
                     .build();
         }
 

@@ -7,6 +7,7 @@ import lombok.*;
 @Table(name = "event")
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString

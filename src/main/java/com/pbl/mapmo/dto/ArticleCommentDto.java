@@ -1,6 +1,8 @@
 package com.pbl.mapmo.dto;
 
-import com.pbl.mapmo.entity.ScheduleComment;
+import com.pbl.mapmo.entity.Article;
+import com.pbl.mapmo.entity.ArticleComment;
+import com.pbl.mapmo.entity.User;
 import lombok.*;
 
 import jakarta.validation.constraints.NotBlank;
@@ -8,7 +10,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class ScheduleCommentDTO {
+public class ArticleCommentDto {
 
     @Getter
     @Setter
@@ -19,9 +21,11 @@ public class ScheduleCommentDTO {
         @NotBlank(message = "내용은 필수 입력값입니다")
         private String content;
 
-        public ScheduleComment toEntity() {
-            return ScheduleComment.builder()
+        public ArticleComment toEntity(User user, Article article) {
+            return ArticleComment.builder()
                     .content(content)
+                    .user(user)
+                    .article(article)
                     .build();
         }
     }
@@ -33,19 +37,19 @@ public class ScheduleCommentDTO {
         private String content;
         private LocalDateTime createdDate;
         private LocalDateTime lastModifiedDate;
-        private UserDTO.Response user;
+        private UserDto.Response user;
 
-        public static Response of(ScheduleComment comment) {
+        public static Response of(ArticleComment comment) {
             return Response.builder()
                     .id(comment.getId())
                     .content(comment.getContent())
                     .createdDate(comment.getCreatedDate())
                     .lastModifiedDate(comment.getLastModifiedDate())
-                    .user(comment.getUser() != null ? UserDTO.Response.of(comment.getUser()) : null)
+                    .user(comment.getUser() != null ? UserDto.Response.of(comment.getUser()) : null)
                     .build();
         }
 
-        public static List<Response> of(List<ScheduleComment> comments) {
+        public static List<Response> of(List<ArticleComment> comments) {
             return comments.stream()
                     .map(Response::of)
                     .collect(Collectors.toList());

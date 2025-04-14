@@ -8,7 +8,7 @@ import lombok.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class SharedScheduleDTO {
+public class SharedScheduleDto {
 
     @Getter
     @Setter
@@ -28,17 +28,17 @@ public class SharedScheduleDTO {
     @Builder
     public static class Response {
         private Integer id;
-        private ScheduleDTO.Response schedule;
-        private UserDTO.Response userMaster;
-        private List<SharedScheduleMemberDTO.Response> sharedMembers;
+        private ScheduleDto.Response schedule;
+        private UserDto.Response userMaster;
+        private List<SharedScheduleMemberDto.Response> sharedMembers;
 
         public static Response of(SharedSchedule sharedSchedule) {
             return Response.builder()
                     .id(sharedSchedule.getId())
-                    .schedule(ScheduleDTO.Response.of(sharedSchedule.getSchedule()))
-                    .userMaster(UserDTO.Response.of(sharedSchedule.getUserMaster()))
+                    .schedule(ScheduleDto.Response.of(sharedSchedule.getSchedule()))
+                    .userMaster(UserDto.Response.of(sharedSchedule.getUserMaster()))
                     .sharedMembers(sharedSchedule.getSharedMembers() != null ?
-                            SharedScheduleMemberDTO.Response.of(sharedSchedule.getSharedMembers()) : null)
+                            SharedScheduleMemberDto.Response.of(sharedSchedule.getSharedMembers()) : null)
                     .build();
         }
 

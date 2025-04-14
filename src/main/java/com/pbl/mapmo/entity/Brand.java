@@ -9,6 +9,7 @@ import java.util.List;
 @Table(name = "brand")
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString(exclude = {"franchises", "events"})

@@ -6,18 +6,18 @@ import lombok.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class BlockMemberDTO {
+public class BlockMemberDto {
 
     @Getter
     @Builder
     public static class Response {
         private Integer id;
-        private UserDTO.Response user;
+        private UserDto.Response user;
 
         public static Response of(BlockMember blockMember) {
             return Response.builder()
                     .id(blockMember.getId())
-                    .user(UserDTO.Response.of(blockMember.getUser()))
+                    .user(UserDto.Response.of(blockMember.getUser()))
                     .build();
         }
 

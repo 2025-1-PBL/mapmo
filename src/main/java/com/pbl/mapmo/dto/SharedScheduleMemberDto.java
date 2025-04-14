@@ -6,16 +6,16 @@ import lombok.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class SharedScheduleMemberDTO {
+public class SharedScheduleMemberDto {
 
     @Getter
     @Builder
     public static class Response {
-        private UserDTO.Response userMember;
+        private UserDto.Response userMember;
 
         public static Response of(SharedScheduleMember member) {
             return Response.builder()
-                    .userMember(UserDTO.Response.of(member.getUserMember()))
+                    .userMember(UserDto.Response.of(member.getUserMember()))
                     .build();
         }
 

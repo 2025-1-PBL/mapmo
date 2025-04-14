@@ -6,9 +6,8 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
-public class BlockDTO {
+public class BlockDto {
 
     @Getter
     @Setter
@@ -24,15 +23,15 @@ public class BlockDTO {
     @Builder
     public static class Response {
         private Integer id;
-        private UserDTO.Response user;
-        private List<BlockMemberDTO.Response> blockMembers;
+        private UserDto.Response user;
+        private List<BlockMemberDto.Response> blockMembers;
 
         public static Response of(Block block) {
             return Response.builder()
                     .id(block.getId())
-                    .user(UserDTO.Response.of(block.getUser()))
+                    .user(UserDto.Response.of(block.getUser()))
                     .blockMembers(block.getBlockMembers() != null ?
-                            BlockMemberDTO.Response.of(block.getBlockMembers()) : null)
+                            BlockMemberDto.Response.of(block.getBlockMembers()) : null)
                     .build();
         }
     }

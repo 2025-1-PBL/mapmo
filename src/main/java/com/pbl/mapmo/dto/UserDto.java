@@ -9,7 +9,7 @@ import jakarta.validation.constraints.Size;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class UserDTO {
+public class UserDto {
 
     @Getter
     @Setter

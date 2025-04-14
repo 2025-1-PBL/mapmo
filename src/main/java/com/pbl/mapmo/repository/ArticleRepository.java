@@ -15,6 +15,10 @@ public interface ArticleRepository extends JpaRepository<Article, Integer> {
     Page<Article> findByUserId(Integer userId, Pageable pageable);
     List<Article> findByLocationContaining(String location);
     Page<Article> findByLocationContaining(String location, Pageable pageable);
+    List<Article> findByTitleContaining(String keyword);
+    Page<Article> findByTitleContaining(String keyword, Pageable pageable);
+    List<Article> findByContentContaining(String keyword);
+    Page<Article> findByContentContaining(String keyword, Pageable pageable);
     List<Article> findByTitleContainingOrContentContaining(String title, String content);
     Page<Article> findByTitleContainingOrContentContaining(String title, String content, Pageable pageable);
 
@@ -23,4 +27,5 @@ public interface ArticleRepository extends JpaRepository<Article, Integer> {
 
     @Query("SELECT a FROM Article a ORDER BY a.likes DESC")
     List<Article> findTopByLikes(Pageable pageable);
+
 }
