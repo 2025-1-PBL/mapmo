@@ -30,22 +30,25 @@ public class Article {
     @Column(columnDefinition = "TEXT")
     private String content;
 
+    @Builder.Default
     @Column(nullable = false)
     private Integer views = 0;
 
+    @Builder.Default
     @Column(nullable = false)
     private Integer likes = 0;
 
+    @Builder.Default
     @Column(nullable = false)
     private Integer dislikes = 0;
 
     @Column(length = 255)
     private String location;
 
-    @Column(precision = 10, scale = 6)
+    @Column
     private Double latitude;
 
-    @Column(precision = 10, scale = 6)
+    @Column
     private Double longitude;
 
     @CreatedDate

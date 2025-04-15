@@ -139,10 +139,7 @@ public class ScheduleService {
      * @return 주변 일정 목록
      */
     public List<Schedule> findSchedulesNearby(Double latitude, Double longitude, Double radius) {
-        // 실제 구현은 위도/경도 기반 거리 계산 로직이 필요합니다
-        // 여기서는 간단한 예시만 제공합니다
-        return scheduleRepository.findByLatitudeBetweenAndLongitudeBetween(
-                latitude - radius, latitude + radius,
-                longitude - radius, longitude + radius);
+        // Haversine 공식을 사용하는 레포지토리 메소드 호출
+        return scheduleRepository.findNearbySchedules(latitude, longitude, radius);
     }
 }

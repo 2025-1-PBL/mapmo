@@ -27,15 +27,17 @@ public class Schedule {
     @Column(length = 255)
     private String location;
 
-    @Column(precision = 10, scale = 6)
+    @Column
     private Double latitude;
 
-    @Column(precision = 10, scale = 6)
+    @Column
     private Double longitude;
 
+    @Builder.Default
     @Column(nullable = false)
     private LocalDateTime date = LocalDateTime.now();
 
+    @Builder.Default
     @Column(name = "is_shared", columnDefinition = "TINYINT(1) DEFAULT 0")
     private Boolean isShared = false;
 

@@ -3,6 +3,8 @@ package com.pbl.mapmo.repository;
 import com.pbl.mapmo.entity.Schedule;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -14,4 +16,12 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Integer> {
     List<Schedule> findByLocationContaining(String location); // 위치 기반으로 스케쥴 검색
     List<Schedule> findByIsSharedTrue(); // 공유된 스케쥴 검색
     List<Schedule> findByTitleContaining(String title); // 제목 기반으로 스케쥴 검색
+
+    @Query(value = "SELECT * FROM schedule s WHERE " +
+            "ST_Distance_Sphere(point(s.longitude, s.latitude), point(:lng, :lat)) <= :distance * 1000",
+            nativeQuery = true)
+    List<Schedule> findNearbySchedules(
+            @Param("lat") Double lat,
+            @Param("lng") Double lng,
+            @Param("distance") Double distance);
 }

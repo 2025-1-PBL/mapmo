@@ -160,10 +160,8 @@ public class ArticleService {
      * @return 주변 게시글 목록
      */
     public List<Article> findArticlesNearby(Double latitude, Double longitude, Double radius) {
-        // 실제 구현은 위도/경도 기반 거리 계산 로직이 필요합니다
-        return articleRepository.findByLatitudeBetweenAndLongitudeBetween(
-                latitude - radius, latitude + radius,
-                longitude - radius, longitude + radius);
+        // Haversine 공식을 사용하는 새 메소드 호출
+        return articleRepository.findNearbyArticles(latitude, longitude, radius);
     }
 
     /**

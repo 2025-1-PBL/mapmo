@@ -15,6 +15,9 @@ java {
 
 repositories {
 	mavenCentral()
+	// 추가 Maven 저장소 설정
+	maven { url 'https://repo1.maven.org/maven2/' }
+	maven { url 'https://repo.maven.apache.org/maven2/' }
 }
 
 dependencies {
@@ -26,7 +29,10 @@ dependencies {
 
 	// JPA, MySQL 드라이버 의존성 추가
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	implementation 'mysql:mysql-connector-java'
+	implementation 'com.mysql:mysql-connector-j'
+
+	// Spring Security 의존성 추가
+	implementation 'org.springframework.boot:spring-boot-starter-security'
 
 	// Lombok 추가
 	compileOnly 'org.projectlombok:lombok'
