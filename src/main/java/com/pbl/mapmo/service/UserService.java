@@ -177,4 +177,16 @@ public class UserService {
     public List<User> searchUsersByName(String name) {
         return userRepository.findByNameContainingAndIsDeletedFalse(name);
     }
+
+    /**
+     * 카카오 소셜 로그인 URL을 생성합니다.
+     *
+     * @param redirectUri 리다이렉트 URI
+     * @return 카카오 로그인 URL
+     */
+    public String getKakaoLoginUrl(String redirectUri) {
+        String baseUrl = "https://kauth.kakao.com/oauth/authorize";
+        String clientId = "563d3e88ec3fdc32b209014aa932bcc3"; // Kakao REST API 키
+        return String.format("%s?response_type=code&client_id=%s&redirect_uri=%s", baseUrl, clientId, redirectUri);
+    }
 }

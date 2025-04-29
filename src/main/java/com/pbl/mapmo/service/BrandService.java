@@ -11,10 +11,14 @@ import com.pbl.mapmo.repository.BrandRepository;
 import com.pbl.mapmo.repository.EventRepository;
 import com.pbl.mapmo.repository.FranchiseRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.http.*;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -23,6 +27,9 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class BrandService {
+
+    @Value("${spring.security.client.kakao.client-id}")
+    private String kakaoClientId;
 
     private final BrandRepository brandRepository;
     private final FranchiseRepository franchiseRepository;
@@ -173,8 +180,19 @@ public class BrandService {
      * 위치 기반 프랜차이즈 검색
      */
     public List<FranchiseDto.Response> searchFranchisesByLocation(Double lat, Double lng, Double distance) {
-        // 구현 예시: 위도, 경도 기준으로 특정 거리 내의 프랜차이즈 검색
-        // 실제 구현은 거리 계산 로직이나 지리적 쿼리를 사용해야 함
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "KakaoAK " + kakaoClientId);
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+
+        String url = String.format(
+                "https://dapi.kakao.com/v2/local/search/category.json?category_group_code=CS2&page=1&size=15&sort=accuracy&x=%f&y=%f&radius=%d",
+                lng, lat, distance.intValue()
+        );
+
+        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
+        System.out.println("Kakao API Response: " + response.getBody());
+
         List<Franchise> nearbyFranchises = franchiseRepository.findNearbyFranchises(lat, lng, distance);
         return nearbyFranchises.stream()
                 .map(this::convertToFranchiseDto)

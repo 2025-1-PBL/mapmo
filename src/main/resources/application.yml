@@ -1,4 +1,10 @@
 spring:
+  security:
+    client:
+      kakao:
+        client-id: 563d3e88ec3fdc32b209014aa932bcc3
+        client-secret: XsC1DAwg6iN6bY78vkicvlKMUXeDuKt8
+
   config:
     import: optional:application-secret.yml
 
