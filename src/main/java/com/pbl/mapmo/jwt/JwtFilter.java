@@ -41,6 +41,12 @@ public class JwtFilter extends GenericFilterBean {
         // `validateToken()` 메서드는 토큰의 서명, 형식, 만료 여부 등을 검사합니다.
         String requestURI = httpServletRequest.getRequestURI();
 
+        // 인증 관련 엔드포인트는 JWT 검증 건너뛰기
+        if (requestURI.equals("/api/authenticate") || requestURI.equals("/api/signup")) {
+            filterChain.doFilter(servletRequest, servletResponse);
+            return;
+        }
+
         // 토큰이 유효하면, `tokenProvider.getAuthentication(jwt)`를 호출하여 토큰에서 사용자 인증 정보를 추출합니다.
         // 추출된 인증 정보를 `SecurityContextHolder`에 저장합니다. 이렇게 하면 현재 요청에 대한 인증 정보가 Spring Security에 설정됩니다.
         if (StringUtils.hasText(jwt) && tokenProvider.validateToken(jwt)) {

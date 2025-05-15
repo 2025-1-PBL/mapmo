@@ -1,6 +1,11 @@
 spring:
+  redis:
+    host: ocb.iptime.org
+    port: 6379
   config:
     import: optional:application-secret.yml
+
+
 
   datasource:
     url: jdbc:mysql://ocb.iptime.org:3309/MAP_MO

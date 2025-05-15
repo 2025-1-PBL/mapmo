@@ -94,4 +94,27 @@ public class TokenProvider implements InitializingBean {
         }
         return false;
     }
+
+    public String createRefreshToken(Authentication authentication) {
+        // 리프레시 토큰 생성 로직 (액세스 토큰보다 긴 유효 기간)
+        long refreshTokenValidityInMilliseconds = 14 * 24 * 60 * 60 * 1000; // 14일
+
+        Date validity = new Date(System.currentTimeMillis() + refreshTokenValidityInMilliseconds);
+
+        return Jwts.builder()
+                .setSubject(authentication.getName())
+                .signWith(key, SignatureAlgorithm.HS512)
+                .setExpiration(validity)
+                .compact();
+    }
+
+    public String getUsernameFromToken(String token) {
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+
+        return claims.getSubject();
+    }
 }
