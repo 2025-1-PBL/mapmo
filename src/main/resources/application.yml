@@ -31,4 +31,6 @@ logging:
     root: INFO
     com.pbl.mapmo: DEBUG
     org.hibernate.SQL: DEBUG
+    org.springframework.security: DEBUG
+    com.pbl.mapmo.jwt: DEBUG
     org.hibernate.type.descriptor.sql: TRACE

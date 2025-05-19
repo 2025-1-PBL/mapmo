@@ -6,6 +6,8 @@ import com.pbl.mapmo.domain.sharedschedulemember.SharedScheduleMember;
 import jakarta.persistence.*;
 import lombok.*;
 import java.util.List;
+import com.pbl.mapmo.domain.authority.Authority;
+import java.util.ArrayList;
 
 @Entity
 @Table(name = "user")
@@ -53,5 +55,9 @@ public class User {
 
     @OneToMany(mappedBy = "userMember")
     private List<SharedScheduleMember> sharedSchedulesAsMember;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @Builder.Default
+    private List<Authority> authorities = new ArrayList<>();
 }
 

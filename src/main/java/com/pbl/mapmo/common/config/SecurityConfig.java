@@ -64,8 +64,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/authenticate").permitAll()
                         // 회원가입 엔드포인트는 모든 사용자에게 접근 허용
                         .requestMatchers("/api/signup").permitAll()
-                        // 추가 디버깅을 위해 모든 요청 로그 확인 경로 허용
-                        .requestMatchers("/actuator/**").permitAll()
+                        .requestMatchers("/").permitAll()
+                        .requestMatchers("/error").permitAll()
                         // 그 외 모든 요청은 인증 필요
                         .anyRequest().authenticated()
                 )

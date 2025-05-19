@@ -13,6 +13,7 @@ import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.util.Arrays;
 
 public class JwtFilter extends GenericFilterBean {
 
@@ -20,6 +21,15 @@ public class JwtFilter extends GenericFilterBean {
     // HTTP 요청 헤더에서 jwt 토큰을 찾기 위한 헤더 이름 정의.
     // 클라이언트는 이 헤더에 "Bearer {토큰}" 형식으로 JWT를 전송.
     public static final String AUTHORIZATION_HEADER = "Authorization";
+
+    // 인증이 필요하지 않은 공개 URL 경로 목록
+    private static final String[] PUBLIC_URLS = {
+            "/api/authenticate",
+            "/api/signup",
+            "/error",
+            "/",
+            ""
+    };
 
     private TokenProvider tokenProvider;
 
@@ -42,7 +52,7 @@ public class JwtFilter extends GenericFilterBean {
         String requestURI = httpServletRequest.getRequestURI();
 
         // 인증 관련 엔드포인트는 JWT 검증 건너뛰기
-        if (requestURI.equals("/api/authenticate") || requestURI.equals("/api/signup")) {
+        if (Arrays.asList(PUBLIC_URLS).contains(requestURI)) {
             filterChain.doFilter(servletRequest, servletResponse);
             return;
         }
