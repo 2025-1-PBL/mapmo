@@ -2,6 +2,8 @@ package com.pbl.mapmo.common.config;
 
 import com.pbl.mapmo.jwt.JwtSecurityConfig;
 import com.pbl.mapmo.jwt.TokenProvider;
+import com.pbl.mapmo.oauth2.CustomOAuth2UserService;
+import com.pbl.mapmo.oauth2.OAuth2SuccessHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -25,15 +27,21 @@ import java.util.Arrays;
 public class SecurityConfig {
 
     private final TokenProvider tokenProvider;
+    private final CustomOAuth2UserService customOAuth2UserService;
+    private final OAuth2SuccessHandler oAuth2SuccessHandler;
 
     /**
      * 생성자를 통해 TokenProvider 의존성 주입
      * @param tokenProvider JWT 토큰 생성 및 검증을 담당하는 컴포넌트
      */
-    public SecurityConfig(TokenProvider tokenProvider) {
+    public SecurityConfig(
+            TokenProvider tokenProvider,
+            CustomOAuth2UserService customOAuth2UserService,
+            OAuth2SuccessHandler oAuth2SuccessHandler) {
         this.tokenProvider = tokenProvider;
+        this.customOAuth2UserService = customOAuth2UserService;
+        this.oAuth2SuccessHandler = oAuth2SuccessHandler;
     }
-
     /**
      * 비밀번호 암호화에 사용할 인코더 빈 정의
      * @return BCrypt 알고리즘을 사용하는 비밀번호 인코더
@@ -66,6 +74,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/signup").permitAll()
                         .requestMatchers("/").permitAll()
                         .requestMatchers("/error").permitAll()
+                        .requestMatchers("/oauth2/**").permitAll()
                         // 그 외 모든 요청은 인증 필요
                         .anyRequest().authenticated()
                 )
@@ -74,7 +83,15 @@ public class SecurityConfig {
                 // HTTP Basic 인증 비활성화
                 .httpBasic(httpBasic -> httpBasic.disable())
                 // JWT 보안 설정 적용
-                .with(new JwtSecurityConfig(tokenProvider), customizer -> {});
+                .with(new JwtSecurityConfig(tokenProvider), customizer -> {})
+                // OAuth2 로그인 설정 추가
+                .oauth2Login(oauth2 -> oauth2
+                    .userInfoEndpoint(userInfo -> userInfo
+                        .userService(customOAuth2UserService)
+                    )
+                    .successHandler(oAuth2SuccessHandler)
+                );
+
 
         return http.build();
     }

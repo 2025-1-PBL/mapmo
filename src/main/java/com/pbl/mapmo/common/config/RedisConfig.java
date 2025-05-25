@@ -1,8 +1,11 @@
 package com.pbl.mapmo.common.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
+import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
@@ -12,6 +15,27 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
  */
 @Configuration
 public class RedisConfig {
+
+    @Value("${spring.redis.host}")
+    private String redisHost;
+
+    @Value("${spring.redis.port}")
+    private int redisPort;
+
+    @Value("${spring.redis.timeout}")
+    private int timeout;
+
+    /**
+     * Redis 연결 팩토리를 명시적으로 구성합니다.
+     */
+    @Bean
+    public RedisConnectionFactory redisConnectionFactory() {
+        RedisStandaloneConfiguration redisConfig = new RedisStandaloneConfiguration(redisHost, redisPort);
+        LettuceConnectionFactory connectionFactory = new LettuceConnectionFactory(redisConfig);
+        // 연결 설정이 변경되면 재시작하도록 설정
+        connectionFactory.setValidateConnection(true);
+        return connectionFactory;
+    }
 
     /**
      * Redis 데이터베이스와 통신하기 위한 RedisTemplate 빈을 생성합니다.
