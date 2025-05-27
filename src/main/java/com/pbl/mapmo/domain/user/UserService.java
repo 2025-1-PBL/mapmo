@@ -225,4 +225,9 @@ public class UserService {
 
         return authorityRepository.findByUser(user);
     }
+
+    // UserService.java에 추가
+    public List<User> getUsersByAuthority(String authority) {
+        return userRepository.findByAuthority(authority);
+    }
 }

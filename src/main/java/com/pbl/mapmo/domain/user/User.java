@@ -35,6 +35,9 @@ public class User {
     @Column(length = 500)
     private String profilePic;  // 이미지 URL 저장
 
+    @Column(name = "fcm_token")
+    private String fcmToken; // fcm token
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = true)
     private Gender sex;

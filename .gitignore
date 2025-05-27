@@ -38,3 +38,6 @@ out/
 
 ### DB 계정 ###
 src/main/resources/application-secret.yml
+
+### firebase 시크릿 키 ###
+src/main/resources/firebase-service-account.json

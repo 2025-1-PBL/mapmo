@@ -3,6 +3,7 @@ package com.pbl.mapmo.domain.user;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -123,5 +124,25 @@ public class UserController {
     public ResponseEntity<List<User>> searchUsersByName(@RequestParam String name) {
         List<User> users = userService.searchUsersByName(name);
         return ResponseEntity.ok(users);
+    }
+
+    // UserController.java에 추가
+    @PostMapping("/{userId}/make-admin")
+    @PreAuthorize("hasRole('ROLE_ADMIN')") // 기존 관리자만 접근 가능
+    public ResponseEntity<User> makeAdmin(@PathVariable Integer userId) {
+        try {
+            User user = userService.addRoleToUser(userId, "ROLE_ADMIN");
+            return ResponseEntity.ok(user);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
+
+    // UserController.java에 추가
+    @GetMapping("/admins")
+    @PreAuthorize("hasRole('ROLE_ADMIN')") // 관리자만 접근 가능
+    public ResponseEntity<List<UserDto.Response>> getAdminUsers() {
+        List<User> adminUsers = userService.getUsersByAuthority("ROLE_ADMIN");
+        return ResponseEntity.ok(UserDto.Response.of(adminUsers));
     }
 }
