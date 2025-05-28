@@ -12,6 +12,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+@Tag(name = "Brand", description = "브랜드·프랜차이즈·이벤트 관련 API")
 @RestController
 @RequestMapping("/api/brands")
 @RequiredArgsConstructor
@@ -22,6 +25,7 @@ public class BrandController {
     /**
      * 모든 브랜드 조회
      */
+    @Operation(summary = "모든 브랜드 조회")
     @GetMapping
     public ResponseEntity<List<BrandDto.Response>> getAllBrands() {
         List<BrandDto.Response> brands = brandService.getAllBrands();
@@ -31,6 +35,7 @@ public class BrandController {
     /**
      * 브랜드 페이징 조회
      */
+    @Operation(summary = "브랜드 페이징 조회")
     @GetMapping("/page")
     public ResponseEntity<Page<BrandDto.Response>> getBrandsByPage(Pageable pageable) {
         Page<BrandDto.Response> brands = brandService.getBrandsByPage(pageable);
@@ -40,6 +45,7 @@ public class BrandController {
     /**
      * 브랜드명으로 브랜드 검색
      */
+    @Operation(summary = "브랜드명으로 브랜드 검색")
     @GetMapping("/search")
     public ResponseEntity<List<BrandDto.Response>> searchBrandsByName(@RequestParam String name) {
         List<BrandDto.Response> brands = brandService.searchBrandsByName(name);
@@ -49,6 +55,7 @@ public class BrandController {
     /**
      * 브랜드 상세 조회
      */
+    @Operation(summary = "브랜드 상세 조회")
     @GetMapping("/{brandId}")
     public ResponseEntity<BrandDto.Response> getBrandById(@PathVariable Integer brandId) {
         BrandDto.Response brand = brandService.getBrandById(brandId);
@@ -58,6 +65,7 @@ public class BrandController {
     /**
      * 브랜드 생성
      */
+    @Operation(summary = "브랜드 생성")
     @PostMapping
     public ResponseEntity<BrandDto.Response> createBrand(@RequestBody BrandDto.Request brandDto) {
         BrandDto.Response createdBrand = brandService.createBrand(brandDto);
@@ -67,6 +75,7 @@ public class BrandController {
     /**
      * 브랜드 정보 수정
      */
+    @Operation(summary = "브랜드 정보 수정")
     @PutMapping("/{brandId}")
     public ResponseEntity<BrandDto.Response> updateBrand(@PathVariable Integer brandId, @RequestBody BrandDto.Request brandDto) {
         BrandDto.Response updatedBrand = brandService.updateBrand(brandId, brandDto);
@@ -76,6 +85,7 @@ public class BrandController {
     /**
      * 브랜드 삭제
      */
+    @Operation(summary = "브랜드 삭제")
     @DeleteMapping("/{brandId}")
     public ResponseEntity<Void> deleteBrand(@PathVariable Integer brandId) {
         brandService.deleteBrand(brandId);
@@ -87,6 +97,7 @@ public class BrandController {
     /**
      * 프랜차이즈 목록 조회 (브랜드별)
      */
+    @Operation(summary = "프랜차이즈 목록 조회 (브랜드별)")
     @GetMapping("/{brandId}/franchises")
     public ResponseEntity<List<FranchiseDto.Response>> getFranchisesByBrandId(@PathVariable Integer brandId) {
         List<FranchiseDto.Response> franchises = brandService.getFranchisesByBrandId(brandId);
@@ -96,6 +107,7 @@ public class BrandController {
     /**
      * 프랜차이즈 생성
      */
+    @Operation(summary = "프랜차이즈 생성")
     @PostMapping("/{brandId}/franchises")
     public ResponseEntity<FranchiseDto.Response> createFranchise(@PathVariable Integer brandId, @RequestBody FranchiseDto.Request franchiseDto) {
         FranchiseDto.Response createdFranchise = brandService.createFranchise(brandId, franchiseDto);
@@ -105,6 +117,7 @@ public class BrandController {
     /**
      * 프랜차이즈 상세 조회
      */
+    @Operation(summary = "프랜차이즈 상세 조회")
     @GetMapping("/franchises/{franchiseId}")
     public ResponseEntity<FranchiseDto.Response> getFranchiseById(@PathVariable Integer franchiseId) {
         FranchiseDto.Response franchise = brandService.getFranchiseById(franchiseId);
@@ -114,6 +127,7 @@ public class BrandController {
     /**
      * 프랜차이즈 정보 수정
      */
+    @Operation(summary = "프랜차이즈 정보 수정")
     @PutMapping("/franchises/{franchiseId}")
     public ResponseEntity<FranchiseDto.Response> updateFranchise(@PathVariable Integer franchiseId, @RequestBody FranchiseDto.Request franchiseDto) {
         FranchiseDto.Response updatedFranchise = brandService.updateFranchise(franchiseId, franchiseDto);
@@ -123,6 +137,7 @@ public class BrandController {
     /**
      * 프랜차이즈 삭제
      */
+    @Operation(summary = "프랜차이즈 삭제")
     @DeleteMapping("/franchises/{franchiseId}")
     public ResponseEntity<Void> deleteFranchise(@PathVariable Integer franchiseId) {
         brandService.deleteFranchise(franchiseId);
@@ -132,6 +147,7 @@ public class BrandController {
     /**
      * 위치 기반 프랜차이즈 검색
      */
+    @Operation(summary = "위치 기반 프랜차이즈 검색")
     @GetMapping("/franchises/nearby")
     public ResponseEntity<List<FranchiseDto.Response>> searchFranchisesByLocation(
             @RequestParam Double lat,
@@ -146,6 +162,7 @@ public class BrandController {
     /**
      * 이벤트 목록 조회 (브랜드별)
      */
+    @Operation(summary = "이벤트 목록 조회 (브랜드별)")
     @GetMapping("/{brandId}/events")
     public ResponseEntity<List<EventDto.Response>> getEventsByBrandId(@PathVariable Integer brandId) {
         List<EventDto.Response> events = brandService.getEventsByBrandId(brandId);
@@ -155,6 +172,7 @@ public class BrandController {
     /**
      * 이벤트 생성
      */
+    @Operation(summary = "이벤트 생성")
     @PostMapping("/{brandId}/events")
     public ResponseEntity<EventDto.Response> createEvent(@PathVariable Integer brandId, @RequestBody EventDto.Request eventDto) {
         EventDto.Response createdEvent = brandService.createEvent(brandId, eventDto);
@@ -164,6 +182,7 @@ public class BrandController {
     /**
      * 이벤트 상세 조회
      */
+    @Operation(summary = "이벤트 상세 조회")
     @GetMapping("/events/{eventId}")
     public ResponseEntity<EventDto.Response> getEventById(@PathVariable Integer eventId) {
         EventDto.Response event = brandService.getEventById(eventId);
@@ -173,6 +192,7 @@ public class BrandController {
     /**
      * 이벤트 정보 수정
      */
+    @Operation(summary = "이벤트 정보 수정")
     @PutMapping("/events/{eventId}")
     public ResponseEntity<EventDto.Response> updateEvent(@PathVariable Integer eventId, @RequestBody EventDto.Request eventDto) {
         EventDto.Response updatedEvent = brandService.updateEvent(eventId, eventDto);
@@ -182,6 +202,7 @@ public class BrandController {
     /**
      * 이벤트 삭제
      */
+    @Operation(summary = "이벤트 삭제")
     @DeleteMapping("/events/{eventId}")
     public ResponseEntity<Void> deleteEvent(@PathVariable Integer eventId) {
         brandService.deleteEvent(eventId);
