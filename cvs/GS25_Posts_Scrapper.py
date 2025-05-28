@@ -54,7 +54,7 @@ if conn:
                                 brand_id,  # brand_id (숫자로 처리)
                                 None,  # start_date (None으로 처리)
                                 None,  # end_date (None으로 처리)
-                                "Active"  # status
+                                "ACTIVE"  # status
                             )
                             # 중복된 URL 무시
                             insert_event(conn, event_data)

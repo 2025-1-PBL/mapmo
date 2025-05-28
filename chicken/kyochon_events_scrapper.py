@@ -76,7 +76,7 @@ def main():
                 6,  # 고정된 brand_id 사용
                 event_details['start_date'],
                 event_details['end_date'],
-                "Active"  # 상태는 진입 항목에서 추출
+                "ACTIVE"  # 상태는 진입 항목에서 추출
             )
             insert_event(conn, event_data)
     finally:

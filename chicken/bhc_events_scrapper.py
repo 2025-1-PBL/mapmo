@@ -61,7 +61,7 @@ def crawl_and_store_events():
                 print("해당하는 날짜 정보가 없습니다.")
 
             # 상태는 임의로 1로 설정
-            status = "Active"
+            status = "ACTIVE"
             brand_id = 7  # 브랜드 ID
 
             # 데이터베이스에 삽입할 이벤트 데이터

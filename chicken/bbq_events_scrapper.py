@@ -71,7 +71,7 @@ if conn:  # DB 연결 성공 시 실행
             content = "N/A"
 
         # 4) 상태는 고정값 (예: "Active")으로 설정
-        status = "Active"
+        status = "ACTIVE"
 
         # 브랜드 ID는 BBQ 고유 ID로 설정 (예: 1)
         brand_id = 5
