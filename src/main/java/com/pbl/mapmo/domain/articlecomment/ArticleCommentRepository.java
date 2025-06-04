@@ -15,5 +15,5 @@ public interface ArticleCommentRepository extends JpaRepository<ArticleComment, 
     List<ArticleComment> findByUserId(Integer userId);
     void deleteByArticleId(Integer articleId);
 
-    List<ArticleComment> findByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
+    List<ArticleComment> findByCreatedDateBetween(LocalDateTime start, LocalDateTime end);
 }

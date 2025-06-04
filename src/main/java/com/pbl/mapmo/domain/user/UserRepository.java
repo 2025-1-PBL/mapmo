@@ -13,6 +13,5 @@ public interface UserRepository extends JpaRepository<User, Integer> { // User �
     List<User> findByNameContaining(String name); // 이름에 일부 문자열 포함된 사용자 조회
     List<User> findByNameContainingAndIsDeletedFalse(String name);
     boolean existsByEmail(String email); // 해당 이메일 db에 존재 여부 확인
-    List<User> findByAuthoritiesNameAndIsDeletedFalse(String authorityName);
-    List<User> findByAuthority(String authority);
+    List<User> findByAuthoritiesAuthorityNameAndIsDeletedFalse(String authorityName);
 }

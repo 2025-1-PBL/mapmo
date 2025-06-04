@@ -228,6 +228,6 @@ public class UserService {
 
     // UserService.java에 추가
     public List<User> getUsersByAuthority(String authority) {
-        return userRepository.findByAuthority(authority);
+        return userRepository.findByAuthoritiesAuthorityNameAndIsDeletedFalse(authority);
     }
 }

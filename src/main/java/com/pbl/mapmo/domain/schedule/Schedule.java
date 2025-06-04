@@ -38,6 +38,7 @@ public class Schedule {
     @Column(name = "reminder_time")
     private LocalDateTime reminderTime;
 
+    @Builder.Default
     @Column(name = "reminder_enabled", columnDefinition = "TINYINT(1) DEFAULT 0")
     private Boolean reminderEnabled = false;
 

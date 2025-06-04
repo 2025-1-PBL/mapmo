@@ -69,7 +69,7 @@ public class NotificationScheduler {
         log.info("새 댓글 알림 스케줄러 실행: {}", now);
 
         // 지난 24시간 동안 작성된 새 댓글 조회
-        List<ArticleComment> newComments = articleCommentRepository.findByCreatedAtBetween(
+        List<ArticleComment> newComments = articleCommentRepository.findByCreatedDateBetween(
                 yesterday, now
         );
 
