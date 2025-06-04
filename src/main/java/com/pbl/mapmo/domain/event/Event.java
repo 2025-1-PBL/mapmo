@@ -26,7 +26,7 @@ public class Event {
     @Column(length = 255)
     private String content;
 
-    @Column(length = 255)
+    @Column(length = 255, unique = true)
     private String url;
 
     // 추가된 필드

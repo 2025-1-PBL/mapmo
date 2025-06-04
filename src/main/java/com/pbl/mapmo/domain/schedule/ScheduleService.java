@@ -140,4 +140,37 @@ public class ScheduleService {
         // Haversine 공식을 사용하는 레포지토리 메소드 호출
         return scheduleRepository.findNearbySchedules(latitude, longitude, radius);
     }
+
+    /**
+     * 일정 알림 설정을 업데이트합니다.
+     *
+     * @param scheduleId 일정 ID
+     * @param enabled 알림 활성화 여부
+     * @param reminderTime 알림 시간
+     * @param userId 사용자 ID (권한 확인용)
+     * @return 수정된 일정
+     */
+    @Transactional
+    public Schedule updateScheduleReminder(Integer scheduleId, Boolean enabled,
+                                           LocalDateTime reminderTime, Integer userId) {
+        Schedule schedule = scheduleRepository.findById(scheduleId)
+                .orElseThrow(() -> new IllegalArgumentException("일정을 찾을 수 없습니다: " + scheduleId));
+
+        // 권한 확인
+        if (!schedule.getUser().getId().equals(userId)) {
+            throw new IllegalStateException("이 일정을 수정할 권한이 없습니다.");
+        }
+
+        // 알림 설정 업데이트
+        schedule.setReminderEnabled(enabled);
+
+        if (reminderTime != null) {
+            schedule.setReminderTime(reminderTime);
+        } else if (enabled) {
+            // 기본적으로 일정 15분 전에 알림
+            schedule.setReminderTime(schedule.getDate().minusMinutes(15));
+        }
+
+        return scheduleRepository.save(schedule);
+    }
 }

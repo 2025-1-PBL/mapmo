@@ -1,5 +1,7 @@
 package com.pbl.mapmo.domain.user;
 
+import com.pbl.mapmo.domain.authority.Authority;
+import com.pbl.mapmo.domain.authority.AuthorityRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -13,11 +15,15 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AuthorityRepository authorityRepository;  // 새로 추가
 
     @Autowired
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository,
+                       PasswordEncoder passwordEncoder,
+                       AuthorityRepository authorityRepository) {  // 생성자 매개변수 추가
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.authorityRepository = authorityRepository;
     }
 
     /**
@@ -48,18 +54,23 @@ public class UserService {
      */
     @Transactional
     public User registerUser(User user) {
-        // 이메일 중복 확인
-        if (userRepository.existsByEmail(user.getEmail())) {
-            throw new RuntimeException("이미 사용 중인 이메일입니다.");
+        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
+            throw new RuntimeException("이미 존재하는 이메일입니다.");
         }
 
         // 비밀번호 암호화
-        if (user.getPassword() != null && !user.getPassword().isEmpty()) {
-            user.setPassword(passwordEncoder.encode(user.getPassword()));
-        }
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
 
-        user.setIsDeleted(false);
-        return userRepository.save(user);
+        // 사용자 저장
+        User savedUser = userRepository.save(user);
+
+        // 기본 권한 추가 (ROLE_USER)
+        Authority authority = new Authority();
+        authority.setUser(savedUser);
+        authority.setAuthorityName("ROLE_USER");
+        authorityRepository.save(authority);
+
+        return savedUser;
     }
 
     /**
@@ -81,11 +92,18 @@ public class UserService {
                     .email(email)
                     .name(name)
                     .profilePic(profilePic)
-                    .password(null)  // 소셜 로그인은 비밀번호 없음
                     .isDeleted(false)
                     .build();
 
-            return userRepository.save(newUser);
+            User savedUser = userRepository.save(newUser);
+
+            // 소셜 로그인 사용자에게도 기본 권한 추가
+            Authority authority = new Authority();
+            authority.setUser(savedUser);
+            authority.setAuthorityName("ROLE_USER");
+            authorityRepository.save(authority);
+
+            return savedUser;
         }
     }
 
@@ -101,21 +119,18 @@ public class UserService {
         User existingUser = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
 
-        // 필드 업데이트
+        // 수정할 필드들 업데이트
         if (updatedUser.getName() != null) {
             existingUser.setName(updatedUser.getName());
         }
-
         if (updatedUser.getProfilePic() != null) {
             existingUser.setProfilePic(updatedUser.getProfilePic());
         }
-
         if (updatedUser.getSex() != null) {
             existingUser.setSex(updatedUser.getSex());
         }
-
-        // 비밀번호 변경 (로컬 회원만 가능)
-        if (updatedUser.getPassword() != null && existingUser.getPassword() != null) {
+        if (updatedUser.getPassword() != null) {
+            // 비밀번호 변경 시 암호화
             existingUser.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
         }
 
@@ -132,7 +147,6 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
 
-        // 실제 삭제가 아닌 논리적 삭제 처리
         user.setIsDeleted(true);
         userRepository.save(user);
     }
@@ -148,19 +162,16 @@ public class UserService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
 
-        // 계정 상태 확인
-        if (Boolean.TRUE.equals(user.getIsDeleted())) {
-            throw new RuntimeException("삭제된 계정입니다.");
+        if (user.getPassword() == null) {
+            throw new RuntimeException("소셜 로그인 사용자입니다.");
         }
 
-        // 로컬 회원 로그인인 경우 비밀번호 확인
-        if (user.getPassword() != null) {
-            if (!passwordEncoder.matches(password, user.getPassword())) {
-                throw new RuntimeException("비밀번호가 일치하지 않습니다.");
-            }
-        } else {
-            // 소셜 로그인인 경우
-            throw new RuntimeException("소셜 로그인 계정은 일반 로그인이 불가능합니다.");
+        if (!passwordEncoder.matches(password, user.getPassword())) {
+            throw new RuntimeException("비밀번호가 일치하지 않습니다.");
+        }
+
+        if (Boolean.TRUE.equals(user.getIsDeleted())) {
+            throw new RuntimeException("삭제된 사용자입니다.");
         }
 
         return user;
@@ -174,5 +185,49 @@ public class UserService {
      */
     public List<User> searchUsersByName(String name) {
         return userRepository.findByNameContainingAndIsDeletedFalse(name);
+    }
+
+    /**
+     * 사용자에게 역할을 추가합니다.
+     *
+     * @param userId 사용자 ID
+     * @param roleName 추가할 역할 이름 (예: "ROLE_ADMIN")
+     * @return 역할이 추가된 사용자
+     */
+    @Transactional
+    public User addRoleToUser(Integer userId, String roleName) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+
+        // 이미 같은 역할이 있는지 확인
+        boolean hasRole = user.getAuthorities().stream()
+                .anyMatch(auth -> auth.getAuthorityName().equals(roleName));
+
+        if (!hasRole) {
+            Authority authority = new Authority();
+            authority.setUser(user);
+            authority.setAuthorityName(roleName);
+            authorityRepository.save(authority);
+        }
+
+        return user;
+    }
+
+    /**
+     * 사용자의 역할을 조회합니다.
+     *
+     * @param userId 사용자 ID
+     * @return 사용자의 역할 목록
+     */
+    public List<Authority> getUserAuthorities(Integer userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+
+        return authorityRepository.findByUser(user);
+    }
+
+    // UserService.java에 추가
+    public List<User> getUsersByAuthority(String authority) {
+        return userRepository.findByAuthoritiesAuthorityNameAndIsDeletedFalse(authority);
     }
 }

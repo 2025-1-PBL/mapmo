@@ -5,6 +5,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -13,4 +14,6 @@ public interface ArticleCommentRepository extends JpaRepository<ArticleComment, 
     Page<ArticleComment> findByArticleId(Integer articleId, Pageable pageable);
     List<ArticleComment> findByUserId(Integer userId);
     void deleteByArticleId(Integer articleId);
+
+    List<ArticleComment> findByCreatedDateBetween(LocalDateTime start, LocalDateTime end);
 }

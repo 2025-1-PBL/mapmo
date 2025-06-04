@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -120,5 +121,28 @@ public class ScheduleController {
                                                               @RequestParam Double radius) {
         List<Schedule> nearbySchedules = scheduleService.findSchedulesNearby(latitude, longitude, radius);
         return ResponseEntity.ok(nearbySchedules);
+    }
+
+    /**
+     * 일정 알림 설정
+     */
+    @PatchMapping("/{scheduleId}/reminder")
+    public ResponseEntity<Schedule> updateScheduleReminder(
+            @PathVariable Integer scheduleId,
+            @RequestBody Map<String, Object> reminderData,
+            @RequestParam Integer userId) {
+
+        Boolean enabled = (Boolean) reminderData.get("enabled");
+        String reminderTimeStr = (String) reminderData.get("reminderTime");
+        LocalDateTime reminderTime = null;
+
+        if (reminderTimeStr != null) {
+            reminderTime = LocalDateTime.parse(reminderTimeStr);
+        }
+
+        Schedule updatedSchedule = scheduleService.updateScheduleReminder(
+                scheduleId, enabled, reminderTime, userId);
+
+        return ResponseEntity.ok(updatedSchedule);
     }
 }
