@@ -75,7 +75,14 @@ public class SecurityConfig {
                         .requestMatchers("/").permitAll()
                         .requestMatchers("/error").permitAll()
                         .requestMatchers("/oauth2/**").permitAll()
-                        // 그 외 모든 요청은 인증 필요
+                        // Swagger & springdoc 경로는 누구나 접근 가능
+                        .requestMatchers(
+                                "/v3/api-docs/**",
+                                "/swagger-ui.html",       // 리다이렉트 엔드포인트
+                                "/swagger-ui/**",         // 실제 정적 리소스
+                                "/swagger-resources/**")  // (필요 시)
+                        .permitAll()
+                        // 나머지는 인증 필요
                         .anyRequest().authenticated()
                 )
                 // 폼 로그인 비활성화

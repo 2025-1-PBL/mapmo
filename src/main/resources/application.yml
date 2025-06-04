@@ -57,6 +57,34 @@ spring:
         format_sql: true
     open-in-view: false
 
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html            # 접속 경로 (브라우저)
+    display-request-duration: true    # 요청 소요 시간 표시
+    tags-sorter: alpha                # 태그 알파벳순 정렬
+    operations-sorter: method         # 같은 태그 내에서는 HTTP 메서드 순
+    doc-expansion: list               # 기본 펼침 상태(list | full | none)
+
+  api-docs:
+    path: /v3/api-docs                # JSON 스펙 엔드포인트
+
+  group-configs:
+    - group: auth
+      display-name: Auth-API
+      paths-to-match:
+        - /api/authenticate
+        - /api/signup
+        - /api/refresh
+        - /api/oauth/**
+        - /api/users/**
+    - group: core
+      display-name: Core-API
+      paths-to-match:
+        - /api/brands/**
+        - /api/comments/**
+        - /api/schedules/**
+        - /api/shared-schedules/**
+
 jwt:
   token-validity-in-seconds: 86400 # 24시간
 

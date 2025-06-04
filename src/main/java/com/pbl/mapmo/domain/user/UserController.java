@@ -9,7 +9,9 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+@Tag(name = "User", description = "사용자 관련 API")
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
@@ -24,6 +26,7 @@ public class UserController {
     /**
      * 이메일로 사용자 조회
      */
+    @Operation(summary = "이메일로 사용자 조회")
     @GetMapping("/email/{email}")
     public ResponseEntity<User> getUserByEmail(@PathVariable String email) {
         Optional<User> user = userService.getUserByEmail(email);
@@ -34,6 +37,7 @@ public class UserController {
     /**
      * ID로 사용자 조회
      */
+    @Operation(summary = "ID로 사용자 조회")
     @GetMapping("/{userId}")
     public ResponseEntity<User> getUserById(@PathVariable Integer userId) {
         Optional<User> user = userService.getUserById(userId);
@@ -44,6 +48,7 @@ public class UserController {
     /**
      * 새 사용자 등록 (회원가입)
      */
+    @Operation(summary = "새 사용자 등록 (회원가입)")
     @PostMapping("/register")
     public ResponseEntity<User> registerUser(@RequestBody User user) {
         try {
@@ -57,6 +62,7 @@ public class UserController {
     /**
      * 소셜 로그인 처리
      */
+    @Operation(summary = "소셜 로그인 처리")
     @PostMapping("/social-login")
     public ResponseEntity<User> socialLogin(@RequestBody Map<String, String> socialUserData) {
         String email = socialUserData.get("email");
@@ -74,6 +80,7 @@ public class UserController {
     /**
      * 사용자 로그인
      */
+    @Operation(summary = "사용자 로그인")
     @PostMapping("/login")
     public ResponseEntity<User> login(@RequestBody Map<String, String> loginData) {
         try {
@@ -94,6 +101,7 @@ public class UserController {
     /**
      * 사용자 정보 수정
      */
+    @Operation(summary = "사용자 정보 수정")
     @PutMapping("/{userId}")
     public ResponseEntity<User> updateUser(@PathVariable Integer userId, @RequestBody User updatedUser) {
         try {
@@ -107,6 +115,7 @@ public class UserController {
     /**
      * 사용자 계정 삭제 (비활성화)
      */
+    @Operation(summary = "사용자 계정 삭제 (비활성화)")
     @DeleteMapping("/{userId}")
     public ResponseEntity<Void> deleteUser(@PathVariable Integer userId) {
         try {
@@ -120,6 +129,7 @@ public class UserController {
     /**
      * 사용자 이름으로 검색
      */
+    @Operation(summary = "사용자 이름으로 검색")
     @GetMapping("/search")
     public ResponseEntity<List<User>> searchUsersByName(@RequestParam String name) {
         List<User> users = userService.searchUsersByName(name);

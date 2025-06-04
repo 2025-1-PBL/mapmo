@@ -9,7 +9,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+@Tag(name = "Schedule", description = "일정 관련 API")
 @RestController
 @RequestMapping("/api/schedules")
 public class ScheduleController {
@@ -24,6 +26,7 @@ public class ScheduleController {
     /**
      * 사용자의 모든 일정 조회
      */
+    @Operation(summary = "사용자 모든 일정 조회")
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<Schedule>> getAllSchedulesByUserId(@PathVariable Integer userId) {
         List<Schedule> schedules = scheduleService.getAllSchedulesByUserId(userId);
@@ -33,6 +36,7 @@ public class ScheduleController {
     /**
      * 일정 ID로 특정 일정 조회
      */
+    @Operation(summary = "일정 상세 조회")
     @GetMapping("/{scheduleId}")
     public ResponseEntity<Schedule> getScheduleById(@PathVariable Integer scheduleId) {
         Optional<Schedule> schedule = scheduleService.getScheduleById(scheduleId);
@@ -43,6 +47,7 @@ public class ScheduleController {
     /**
      * 새로운 일정 생성
      */
+    @Operation(summary = "일정 생성")
     @PostMapping
     public ResponseEntity<Schedule> createSchedule(@RequestBody Schedule schedule,
                                                    @RequestParam Integer userId) {
@@ -57,6 +62,7 @@ public class ScheduleController {
     /**
      * 기존 일정 수정
      */
+    @Operation(summary = "일정 수정")
     @PutMapping("/{scheduleId}")
     public ResponseEntity<Schedule> updateSchedule(@PathVariable Integer scheduleId,
                                                    @RequestBody Schedule updatedSchedule,
@@ -75,6 +81,7 @@ public class ScheduleController {
     /**
      * 일정 삭제
      */
+    @Operation(summary = "일정 삭제")
     @DeleteMapping("/{scheduleId}")
     public ResponseEntity<Void> deleteSchedule(@PathVariable Integer scheduleId,
                                                @RequestParam Integer userId) {
@@ -92,6 +99,7 @@ public class ScheduleController {
     /**
      * 일정 공유 상태 변경
      */
+    @Operation(summary = "일정 공유 상태 변경")
     @PatchMapping("/{scheduleId}/share")
     public ResponseEntity<Schedule> updateScheduleShareStatus(@PathVariable Integer scheduleId,
                                                               @RequestBody Map<String, Boolean> shareStatus,
@@ -115,6 +123,7 @@ public class ScheduleController {
     /**
      * 특정 위치 주변의 일정 검색
      */
+    @Operation(summary = "주변 일정 검색")
     @GetMapping("/nearby")
     public ResponseEntity<List<Schedule>> findSchedulesNearby(@RequestParam Double latitude,
                                                               @RequestParam Double longitude,

@@ -8,7 +8,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+@Tag(name = "SharedSchedule", description = "공유 일정 API")
 @RestController
 @RequestMapping("/api/shared-schedules")
 public class SharedScheduleController {
@@ -23,6 +25,7 @@ public class SharedScheduleController {
     /**
      * 일정 공유하기
      */
+    @Operation(summary = "일정 공유")
     @PostMapping("/share")
     public ResponseEntity<SharedSchedule> shareSchedule(@RequestParam Integer scheduleId,
                                                         @RequestParam Integer userId) {
@@ -42,6 +45,7 @@ public class SharedScheduleController {
     /**
      * 공유 일정에 멤버 추가
      */
+    @Operation(summary = "공유 일정에 멤버 추가")
     @PostMapping("/{sharedScheduleId}/members")
     public ResponseEntity<SharedScheduleMember> addMemberToSharedSchedule(
             @PathVariable Integer sharedScheduleId,
@@ -64,6 +68,7 @@ public class SharedScheduleController {
     /**
      * 공유 일정에서 멤버 제거
      */
+    @Operation(summary = "공유 일정에서 멤버 제거")
     @DeleteMapping("/{sharedScheduleId}/members/{memberUserId}")
     public ResponseEntity<Void> removeMemberFromSharedSchedule(
             @PathVariable Integer sharedScheduleId,
@@ -84,6 +89,7 @@ public class SharedScheduleController {
     /**
      * 공유 일정 취소
      */
+    @Operation(summary = "공유 일정 취소")
     @DeleteMapping("/{sharedScheduleId}")
     public ResponseEntity<Void> cancelSharedSchedule(
             @PathVariable Integer sharedScheduleId,
@@ -102,6 +108,7 @@ public class SharedScheduleController {
     /**
      * 사용자에게 공유된 모든 일정 조회
      */
+    @Operation(summary = "사용자에게 공유된 일정 조회")
     @GetMapping("/shared-with-me")
     public ResponseEntity<List<SharedSchedule>> getSharedSchedulesForUser(@RequestParam Integer userId) {
         List<SharedSchedule> sharedSchedules = sharedScheduleService.getSharedSchedulesForUser(userId);
@@ -111,6 +118,7 @@ public class SharedScheduleController {
     /**
      * 사용자가 소유한 모든 공유 일정 조회
      */
+    @Operation(summary = "사용자가 소유한 공유 일정 조회")
     @GetMapping("/owned")
     public ResponseEntity<List<SharedSchedule>> getOwnedSharedSchedules(@RequestParam Integer userId) {
         List<SharedSchedule> ownedSchedules = sharedScheduleService.getOwnedSharedSchedules(userId);
@@ -120,6 +128,7 @@ public class SharedScheduleController {
     /**
      * 특정 공유 일정의 모든 멤버 조회
      */
+    @Operation(summary = "공유 일정의 멤버 목록 조회")
     @GetMapping("/{sharedScheduleId}/members")
     public ResponseEntity<List<User>> getMembersOfSharedSchedule(@PathVariable Integer sharedScheduleId) {
         List<User> members = sharedScheduleService.getMembersOfSharedSchedule(sharedScheduleId);

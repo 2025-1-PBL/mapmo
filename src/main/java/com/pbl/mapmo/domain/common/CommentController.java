@@ -12,6 +12,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+@Tag(name = "Comment", description = "게시글·일정 댓글 API")
 @RestController
 @RequestMapping("/api/comments")
 public class CommentController {
@@ -26,6 +29,7 @@ public class CommentController {
     /**
      * 게시글의 댓글 목록 조회 (페이징)
      */
+    @Operation(summary = "게시글 댓글 목록 조회 (페이징)")
     @GetMapping("/articles/{articleId}")
     public ResponseEntity<Page<ArticleComment>> getArticleComments(
             @PathVariable Integer articleId,
@@ -38,6 +42,7 @@ public class CommentController {
     /**
      * 게시글에 새 댓글 작성
      */
+    @Operation(summary = "게시글 댓글 작성")
     @PostMapping("/articles/{articleId}")
     public ResponseEntity<ArticleComment> createArticleComment(
             @PathVariable Integer articleId,
@@ -54,6 +59,7 @@ public class CommentController {
     /**
      * 게시글 댓글 수정
      */
+    @Operation(summary = "게시글 댓글 수정")
     @PutMapping("/articles/{commentId}")
     public ResponseEntity<ArticleComment> updateArticleComment(
             @PathVariable Integer commentId,
@@ -73,6 +79,7 @@ public class CommentController {
     /**
      * 게시글 댓글 삭제
      */
+    @Operation(summary = "게시글 댓글 삭제")
     @DeleteMapping("/articles/{commentId}")
     public ResponseEntity<Void> deleteArticleComment(
             @PathVariable Integer commentId,
@@ -91,6 +98,7 @@ public class CommentController {
     /**
      * 일정의 댓글 목록 조회
      */
+    @Operation(summary = "일정 댓글 목록 조회")
     @GetMapping("/schedules/{scheduleId}")
     public ResponseEntity<List<ScheduleComment>> getScheduleComments(@PathVariable Integer scheduleId) {
         List<ScheduleComment> comments = commentService.getScheduleComments(scheduleId);
@@ -100,6 +108,7 @@ public class CommentController {
     /**
      * 일정에 새 댓글 작성
      */
+    @Operation(summary = "일정 댓글 작성")
     @PostMapping("/schedules/{scheduleId}")
     public ResponseEntity<ScheduleComment> createScheduleComment(
             @PathVariable Integer scheduleId,
@@ -119,6 +128,7 @@ public class CommentController {
     /**
      * 일정 댓글 수정
      */
+    @Operation(summary = "일정 댓글 수정")
     @PutMapping("/schedules/{commentId}")
     public ResponseEntity<ScheduleComment> updateScheduleComment(
             @PathVariable Integer commentId,
@@ -138,6 +148,7 @@ public class CommentController {
     /**
      * 일정 댓글 삭제
      */
+    @Operation(summary = "일정 댓글 삭제")
     @DeleteMapping("/schedules/{commentId}")
     public ResponseEntity<Void> deleteScheduleComment(
             @PathVariable Integer commentId,
