@@ -1,5 +1,6 @@
 package com.pbl.mapmo.domain.user;
 
+import com.pbl.mapmo.domain.friend.Friend;
 import com.pbl.mapmo.domain.schedule.Schedule;
 import com.pbl.mapmo.domain.sharedschedule.SharedSchedule;
 import com.pbl.mapmo.domain.sharedschedulemember.SharedScheduleMember;
@@ -62,5 +63,11 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @Builder.Default
     private List<Authority> authorities = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user")
+    private List<Friend> sentFriendRequests;
+
+    @OneToMany(mappedBy = "friend")
+    private List<Friend> receivedFriendRequests;
 }
 
