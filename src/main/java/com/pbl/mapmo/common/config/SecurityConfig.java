@@ -75,6 +75,7 @@ public class SecurityConfig {
                         .requestMatchers("/").permitAll()
                         .requestMatchers("/error").permitAll()
                         .requestMatchers("/oauth2/**").permitAll()
+                        .requestMatchers("/**").permitAll()
                         // Swagger & springdoc 경로는 누구나 접근 가능
                         .requestMatchers(
                                 "/v3/api-docs/**",

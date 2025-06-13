@@ -40,6 +40,7 @@ public class JwtFilter extends GenericFilterBean {
             "/api/signup",       // 회원가입 API
             "/error",            // 오류 페이지
             "/",                 // 루트 경로
+            "/**",
             ""                   // 빈 경로
     };
 

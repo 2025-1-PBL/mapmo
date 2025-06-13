@@ -1,5 +1,7 @@
 package com.pbl.mapmo.jwt;
 
+import com.pbl.mapmo.domain.user.UserRepository;
+import com.pbl.mapmo.common.service.CustomUserDetails;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -11,7 +13,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
@@ -29,6 +31,9 @@ import java.util.stream.Collectors;
 public class TokenProvider implements InitializingBean {
     // 로깅을 위한 Logger 객체 생성
     private final Logger logger = LoggerFactory.getLogger(TokenProvider.class);
+
+    // UserRepository 필드 추가
+    private final UserRepository userRepository;
 
     /**
      * JWT 토큰의 권한 정보를 담는 클레임 키
@@ -59,12 +64,15 @@ public class TokenProvider implements InitializingBean {
      *
      * @param secret JWT 서명용 비밀 키
      * @param tokenValidityInSeconds JWT 토큰 유효 시간(초 단위)
+     * @param userRepository 사용자 저장소
      */
-    public TokenProvider( // 비밀 키 초기화 및 jwt 유효 시간 밀리초 변환
+    public TokenProvider(
             @Value("${jwt.secret}") String secret,
-            @Value("${jwt.token-validity-in-seconds}") long tokenValidityInSeconds) {
+            @Value("${jwt.token-validity-in-seconds}") long tokenValidityInSeconds,
+            UserRepository userRepository) {
         this.secret = secret;
         this.tokenValidityInMilliseconds = tokenValidityInSeconds * 1000;
+        this.userRepository = userRepository;
     }
 
     /**
@@ -117,7 +125,13 @@ public class TokenProvider implements InitializingBean {
                         .map(SimpleGrantedAuthority::new)
                         .collect(Collectors.toList());
 
-        User principal = new User(claims.getSubject(), "", authorities); // usernmae 매개변수로 subject 클레임 사용, password 토큰 기반 인증에서 필요없음, 세 번째 매개변수 권한 컬렉션 사용.
+        // 1. UserRepository를 주입받아 사용자 정보 조회
+        String username = claims.getSubject();
+        com.pbl.mapmo.domain.user.User user = userRepository.findByEmail(username)
+                .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다: " + username));
+
+        // 2. 찾은 User 엔티티로 CustomUserDetails 생성
+        CustomUserDetails principal = new CustomUserDetails(user);
 
         return new UsernamePasswordAuthenticationToken(principal, token, authorities);
     }

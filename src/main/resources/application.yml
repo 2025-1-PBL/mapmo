@@ -98,5 +98,5 @@ logging:
     org.hibernate.SQL: DEBUG
     org.springframework.security: DEBUG
     org.springframework.data.redis: DEBUG
-    com.pbl.mapmo.jwt: DEBUG
+    com.pbl.mapmo.jwt: TRACE
     org.hibernate.type.descriptor.sql: TRACE
