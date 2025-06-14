@@ -69,7 +69,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     
     @Override
     protected String determineTargetUrl(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
-        // 프론트엔드 URL로 리다이렉트
-        return "http://localhost:3000/oauth2/redirect";
+        // Flutter 앱용 딥링크로 리다이렉트
+        return "mapmo://oauth2/redirect";
     }
 }
