@@ -9,6 +9,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
@@ -33,6 +34,7 @@ public class ArticleController {
      * @return 페이징된 게시글 목록
      */
     @GetMapping
+    @Transactional(readOnly = true)
     public ResponseEntity<Page<ArticleDto.Response>> getAllArticles(
             @PageableDefault(size = 10) Pageable pageable) {
         Page<Article> articles = articleService.getAllArticles(pageable);
@@ -47,6 +49,7 @@ public class ArticleController {
      * @return 조회된 게시글
      */
     @GetMapping("/{articleId}")
+    @Transactional(readOnly = true)
     public ResponseEntity<ArticleDto.Response> getArticleById(@PathVariable Integer articleId) {
         Optional<Article> article = articleService.getArticleById(articleId);
         return article
@@ -124,6 +127,7 @@ public class ArticleController {
      * @return 업데이트된 게시글
      */
     @PostMapping("/{articleId}/like")
+    @Transactional
     public ResponseEntity<ArticleDto.Response> likeArticle(@PathVariable Integer articleId) {
         try {
             Article article = articleService.likeArticle(articleId);
@@ -140,6 +144,7 @@ public class ArticleController {
      * @return 업데이트된 게시글
      */
     @PostMapping("/{articleId}/dislike")
+    @Transactional
     public ResponseEntity<ArticleDto.Response> dislikeArticle(@PathVariable Integer articleId) {
         try {
             Article article = articleService.dislikeArticle(articleId);
@@ -158,6 +163,7 @@ public class ArticleController {
      * @return 주변 게시글 목록
      */
     @GetMapping("/nearby")
+    @Transactional(readOnly = true)
     public ResponseEntity<List<ArticleDto.Response>> findArticlesNearby(
             @RequestParam Double latitude,
             @RequestParam Double longitude,
@@ -174,6 +180,7 @@ public class ArticleController {
      * @return 검색된 게시글 목록
      */
     @GetMapping("/search/title")
+    @Transactional(readOnly = true)
     public ResponseEntity<Page<ArticleDto.Response>> searchArticlesByTitle(
             @RequestParam String keyword,
             @PageableDefault(size = 10) Pageable pageable) {
@@ -190,6 +197,7 @@ public class ArticleController {
      * @return 검색된 게시글 목록
      */
     @GetMapping("/search/content")
+    @Transactional(readOnly = true)
     public ResponseEntity<Page<ArticleDto.Response>> searchArticlesByContent(
             @RequestParam String keyword,
             @PageableDefault(size = 10) Pageable pageable) {

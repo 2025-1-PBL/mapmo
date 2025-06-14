@@ -72,6 +72,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/authenticate").permitAll()
                         // 회원가입 엔드포인트는 모든 사용자에게 접근 허용
                         .requestMatchers("/api/signup").permitAll()
+                        // 이메일 중복확인 엔드포인트는 모든 사용자에게 접근 허용
+                        .requestMatchers("/api/check-email/**").permitAll()
                         .requestMatchers("/").permitAll()
                         .requestMatchers("/error").permitAll()
                         .requestMatchers("/oauth2/**").permitAll()

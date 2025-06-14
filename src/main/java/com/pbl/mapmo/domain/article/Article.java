@@ -1,5 +1,6 @@
 package com.pbl.mapmo.domain.article;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.pbl.mapmo.domain.user.User;
 import com.pbl.mapmo.domain.articlecomment.ArticleComment;
 import jakarta.persistence.*;
@@ -65,6 +66,7 @@ public class Article {
     @JoinColumn(name = "user_id", referencedColumnName = "id", foreignKey = @ForeignKey(name = "article_ibfk_1"))
     private User user;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "article", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ArticleComment> articleComments;
 }

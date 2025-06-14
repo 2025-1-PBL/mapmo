@@ -1,5 +1,6 @@
 package com.pbl.mapmo.domain.articlecomment;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.pbl.mapmo.domain.article.Article;
 import com.pbl.mapmo.domain.user.User;
 import jakarta.persistence.*;
@@ -39,6 +40,7 @@ public class ArticleComment {
     @JoinColumn(name = "user_id", referencedColumnName = "id", foreignKey = @ForeignKey(name = "article_comment_ibfk_1"), nullable = true)
     private User user;
 
+    @JsonBackReference
     @ManyToOne
     @JoinColumn(name = "article_id", referencedColumnName = "id", foreignKey = @ForeignKey(name = "article_comment_ibfk_2"), nullable = true)
     private Article article;

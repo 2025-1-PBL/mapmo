@@ -72,8 +72,7 @@ public class ArticleDto {
                     .createdDate(article.getCreatedDate())
                     .lastModifiedDate(article.getLastModifiedDate())
                     .user(UserDto.Response.of(article.getUser()))
-                    .comments(article.getArticleComments() != null ?
-                            ArticleCommentDto.Response.of(article.getArticleComments()) : null)
+                    .comments(null)
                     .build();
         }
 

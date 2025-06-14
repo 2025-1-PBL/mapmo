@@ -28,6 +28,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import java.util.HashMap;
+import java.util.Map;
 @Tag(name = "Auth", description = "인증·인가 API")
 @RestController
 @RequestMapping("/api")
@@ -107,6 +111,19 @@ public class AuthController {
                 .body(UserDto.Response.of(savedUser));
     }
 
+    /**
+     * 이메일 중복 확인
+     */
+    @Operation(summary = "이메일 중복 확인")
+    @GetMapping("/check-email/{email}")
+    public ResponseEntity<Map<String, Object>> checkEmailDuplicate(@PathVariable String email) {
+        boolean exists = userRepository.existsByEmail(email);
+        Map<String, Object> response = new HashMap<>();
+        response.put("available", !exists);
+        response.put("message", exists ? "이미 사용 중인 이메일입니다." : "사용 가능한 이메일입니다.");
+        
+        return ResponseEntity.ok(response);
+    }
 
     @Operation(summary = "액세스 토큰 재발급")
     @PostMapping("/refresh")
