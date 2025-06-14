@@ -1,5 +1,6 @@
 package com.pbl.mapmo.domain.user;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.pbl.mapmo.domain.friend.Friend;
 import com.pbl.mapmo.domain.schedule.Schedule;
 import com.pbl.mapmo.domain.sharedschedule.SharedSchedule;
@@ -51,12 +52,15 @@ public class User {
     @Column(name = "is_deleted", columnDefinition = "TINYINT(1) DEFAULT 0")
     private Boolean isDeleted = false;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "user")
     private List<Schedule> schedules;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "userMaster")
     private List<SharedSchedule> masterSchedules;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "userMember")
     private List<SharedScheduleMember> sharedSchedulesAsMember;
 
@@ -64,9 +68,11 @@ public class User {
     @Builder.Default
     private List<Authority> authorities = new ArrayList<>();
 
+    @JsonIgnore
     @OneToMany(mappedBy = "user")
     private List<Friend> sentFriendRequests;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "friend")
     private List<Friend> receivedFriendRequests;
 }

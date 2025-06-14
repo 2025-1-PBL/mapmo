@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -49,13 +50,28 @@ public class ScheduleController {
      */
     @Operation(summary = "일정 생성")
     @PostMapping
-    public ResponseEntity<Schedule> createSchedule(@RequestBody Schedule schedule,
+    public ResponseEntity<?> createSchedule(@RequestBody Schedule schedule,
                                                    @RequestParam Integer userId) {
         try {
             Schedule createdSchedule = scheduleService.createSchedule(schedule, userId);
-            return ResponseEntity.status(HttpStatus.CREATED).body(createdSchedule);
+            
+            // User 객체 대신 필요한 정보만 반환
+            Map<String, Object> response = new HashMap<>();
+            response.put("id", createdSchedule.getId());
+            response.put("title", createdSchedule.getTitle());
+            response.put("content", createdSchedule.getContent());
+            response.put("location", createdSchedule.getLocation());
+            response.put("latitude", createdSchedule.getLatitude());
+            response.put("longitude", createdSchedule.getLongitude());
+            response.put("reminderTime", createdSchedule.getReminderTime());
+            response.put("reminderEnabled", createdSchedule.getReminderEnabled());
+            response.put("date", createdSchedule.getDate());
+            response.put("isShared", createdSchedule.getIsShared());
+            
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Map.of("message", "일정 생성 중 오류가 발생했습니다: " + e.getMessage()));
         }
     }
 

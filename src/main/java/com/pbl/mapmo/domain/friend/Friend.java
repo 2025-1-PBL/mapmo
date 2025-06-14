@@ -1,5 +1,6 @@
 package com.pbl.mapmo.domain.friend;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.pbl.mapmo.domain.user.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -21,10 +22,12 @@ public class Friend {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @JsonBackReference
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    @JsonBackReference
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "friend_id", nullable = false)
     private User friend;

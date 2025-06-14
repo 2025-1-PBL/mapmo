@@ -1,5 +1,7 @@
 package com.pbl.mapmo.domain.schedule;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.pbl.mapmo.domain.user.User;
 import com.pbl.mapmo.domain.sharedschedule.SharedSchedule;
 import jakarta.persistence.*;
@@ -50,10 +52,12 @@ public class Schedule {
     @Column(name = "is_shared", columnDefinition = "TINYINT(1) DEFAULT 0")
     private Boolean isShared = false;
 
+    @JsonBackReference
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id", foreignKey = @ForeignKey(name = "schedule_ibfk_1"))
     private User user;
 
+    @JsonIgnore
     @OneToOne(mappedBy = "schedule")
     private SharedSchedule sharedSchedule; // 스케줄 하나는 하나의 공유스케줄만 가짐
 }
