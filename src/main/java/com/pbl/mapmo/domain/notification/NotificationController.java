@@ -41,12 +41,11 @@ public class NotificationController {
     /**
      * 사용자의 읽지 않은 알림 목록을 조회합니다.
      *
-     * @param authentication 현재 인증 정보
+     * @param user 현재 인증된 사용자
      * @return 읽지 않은 알림 목록
      */
     @GetMapping("/unread")
-    public ResponseEntity<List<Notification>> getUnreadNotifications(Authentication authentication) {
-        User user = (User) authentication.getPrincipal();
+    public ResponseEntity<List<Notification>> getUnreadNotifications(@AuthenticationPrincipal User user) {
         List<Notification> notifications = notificationService.getUnreadNotifications(user);
         return ResponseEntity.ok(notifications);
     }
@@ -54,12 +53,11 @@ public class NotificationController {
     /**
      * 사용자의 읽지 않은 알림 수를 조회합니다.
      *
-     * @param authentication 현재 인증 정보
+     * @param user 현재 인증된 사용자
      * @return 읽지 않은 알림 수
      */
     @GetMapping("/count")
-    public ResponseEntity<Map<String, Long>> getUnreadCount(Authentication authentication) {
-        User user = (User) authentication.getPrincipal();
+    public ResponseEntity<Map<String, Long>> getUnreadCount(@AuthenticationPrincipal User user) {
         long count = notificationService.getUnreadCount(user);
         return ResponseEntity.ok(Map.of("count", count));
     }
@@ -111,7 +109,26 @@ public class NotificationController {
      * @param headerAccessor WebSocket 헤더 정보
      */
     @MessageMapping("/notifications.connect")
-    public void connect(@Payload Object message, SimpMessageHeaderAccessor headerAccessor) {
-        // WebSocket 연결 로직
+    public void connect(@Payload Map<String, Object> message,
+                        SimpMessageHeaderAccessor headerAccessor) {
+        // 1. 메시지에서 사용자 ID 추출
+        String userId = (String) message.get("userId");
+
+        // 2. 세션에 사용자 정보 저장
+        if (userId != null && !userId.isEmpty()) {
+            // Integer로 파싱하여 사용 (Long 대신)
+            User user = userRepository.findById(Integer.parseInt(userId))
+                    .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다"));
+
+            // 세션에 사용자 정보 저장
+            headerAccessor.getSessionAttributes().put("USER_ID", userId);
+
+            // 3. 사용자를 알림 시스템에 연결
+            notificationService.connectUser(user, headerAccessor.getSessionId());
+
+            // 4. 로그 기록 (선택사항)
+            System.out.println("사용자 " + userId + "가 알림 시스템에 연결되었습니다. 세션 ID: " +
+                    headerAccessor.getSessionId());
+        }
     }
 }

@@ -2,14 +2,18 @@ package com.pbl.mapmo.domain.notification;
 
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.Message;
+import com.pbl.mapmo.domain.schedule.Schedule;
+import com.pbl.mapmo.domain.schedule.ScheduleRepository;
 import com.pbl.mapmo.domain.user.User;
 import com.pbl.mapmo.domain.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -18,12 +22,45 @@ import java.util.Map;
  * 알림 생성, 조회, 푸시 알림 전송 등의 비즈니스 로직을 처리합니다.
  */
 @Service
-@RequiredArgsConstructor
 @Slf4j  // 로깅을 위한 Lombok 어노테이션
 public class NotificationService {
 
     private final NotificationRepository notificationRepository;
     private final UserRepository userRepository;
+    private final ScheduleRepository scheduleRepository;
+    private final SimpMessagingTemplate simpMessagingTemplate;
+
+    // 사용자 ID와 WebSocket 세션 ID를 매핑하는 맵 추가
+    private final Map<Integer, String> userSessionMap = new HashMap<>();
+
+    public NotificationService(NotificationRepository notificationRepository,
+                               UserRepository userRepository,
+                               ScheduleRepository scheduleRepository,
+                               SimpMessagingTemplate simpMessagingTemplate) {
+        this.notificationRepository = notificationRepository;
+        this.userRepository = userRepository;
+        this.scheduleRepository = scheduleRepository;
+        this.simpMessagingTemplate = simpMessagingTemplate;
+    }
+
+    /**
+     * 사용자를 알림 시스템에 연결합니다.
+     *
+     * @param user 연결할 사용자
+     * @param sessionId 사용자의 WebSocket 세션 ID
+     */
+    public void connectUser(User user, String sessionId) {
+        // 구현 예시:
+        // 1. 사용자와 세션 ID를 매핑하여 저장
+        userSessionMap.put(user.getId(), sessionId);
+
+        // 2. 필요한 경우 미처리된 알림을 즉시 전송
+        List<Notification> pendingNotifications = getUnreadNotifications(user);
+        sendNotifications(user, pendingNotifications);
+
+        // 현재는 로깅만 수행
+        System.out.println("사용자 " + user.getId() + "가 세션 " + sessionId + "로 연결되었습니다.");
+    }
 
     /**
      * 새 알림을 생성하고 저장합니다.
@@ -145,8 +182,12 @@ public class NotificationService {
      */
     @Transactional
     public void createScheduleInvitationNotification(User receiver, User sender, Long scheduleId) {
-        String title = "일정 초대";
-        String message = sender.getName() + "님이 공유 일정에 초대했습니다.";
+        // Schedule 객체 조회 (ScheduleRepository 필요)
+        Schedule schedule = scheduleRepository.findById(Math.toIntExact(scheduleId))
+                .orElseThrow(() -> new IllegalArgumentException("해당 일정이 존재하지 않습니다: " + scheduleId));
+
+        String title = "일정 초대";  // 알림 제목 설정
+        String message = sender.getName() + "님이 '" + schedule.getTitle() + "' 일정에 초대했습니다.";
 
         Notification notification = saveNotification(receiver, title, message,
                 NotificationType.SCHEDULE_INVITATION, scheduleId);
@@ -217,6 +258,35 @@ public class NotificationService {
         List<Notification> unreadNotifications = notificationRepository.findByUserAndIsReadFalseOrderByCreatedAtDesc(user);
         unreadNotifications.forEach(notification -> notification.setRead(true));
         notificationRepository.saveAll(unreadNotifications);
+    }
+
+    /**
+     * 사용자에게 알림 목록을 전송합니다.
+     *
+     * @param user 알림을 받을 사용자
+     * @param notifications 전송할 알림 목록
+     */
+    public void sendNotifications(User user, List<Notification> notifications) {
+        if (notifications == null || notifications.isEmpty()) {
+            return; // 전송할 알림이 없으면 종료
+        }
+
+        // 연결된 세션이 있는지 확인
+        String sessionId = userSessionMap.get(user.getId());
+        if (sessionId == null) {
+            log.info("사용자 {}의 활성 세션이 없어 알림을 전송할 수 없습니다.", user.getId());
+            return;
+        }
+
+        // WebSocket을 통해 알림 전송
+        simpMessagingTemplate.convertAndSendToUser(
+                sessionId,
+                "/queue/notifications",
+                notifications
+        );
+
+        log.info("사용자 {}에게 {} 개의 알림을 세션 {}로 전송했습니다.",
+                user.getId(), notifications.size(), sessionId);
     }
 
     /**
