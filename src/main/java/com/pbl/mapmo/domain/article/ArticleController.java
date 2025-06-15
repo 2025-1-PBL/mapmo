@@ -130,7 +130,6 @@ public class ArticleController {
      * @return 업데이트된 게시글
      */
     @PostMapping("/{articleId}/like")
-    @Transactional
     public ResponseEntity<ArticleDto.Response> likeArticle(
             @PathVariable Integer articleId,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
@@ -145,7 +144,6 @@ public class ArticleController {
      * @return 업데이트된 게시글
      */
     @PostMapping("/{articleId}/dislike")
-    @Transactional
     public ResponseEntity<ArticleDto.Response> dislikeArticle(
             @PathVariable Integer articleId,
             @AuthenticationPrincipal CustomUserDetails userDetails) {

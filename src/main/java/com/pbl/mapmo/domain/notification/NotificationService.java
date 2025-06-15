@@ -50,6 +50,7 @@ public class NotificationService {
      * @param sessionId 사용자의 WebSocket 세션 ID
      */
     public void connectUser(User user, String sessionId) {
+        log.info("사용자 알림 시스템 연결: 사용자={}, 세션ID={}", user.getId(), sessionId);
         // 구현 예시:
         // 1. 사용자와 세션 ID를 매핑하여 저장
         userSessionMap.put(user.getId(), sessionId);

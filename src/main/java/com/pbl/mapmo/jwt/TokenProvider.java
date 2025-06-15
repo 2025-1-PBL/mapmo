@@ -1,5 +1,6 @@
 package com.pbl.mapmo.jwt;
 
+import com.pbl.mapmo.domain.user.User;
 import com.pbl.mapmo.domain.user.UserRepository;
 import com.pbl.mapmo.common.service.CustomUserDetails;
 import io.jsonwebtoken.*;
@@ -112,26 +113,29 @@ public class TokenProvider implements InitializingBean {
      * @param token JWT 토큰
      * @return Spring Security 인증 객체(Authentication)
      */
-    public Authentication getAuthentication(String token) { // 토큰 파싱, Authentication 객체로 변환. 토큰에서 인증 정보 추출.
-        Claims claims = Jwts
-                .parserBuilder() // jwt 파서 생성
-                .setSigningKey(key) // 토큰 검증에 사용할 서명 키 설정
+    public Authentication getAuthentication(String token) {
+        // 토큰에서 Claims 추출
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(key)
                 .build()
-                .parseClaimsJws(token) // 토큰 파싱, 검증.
-                .getBody(); // 토큰의 본문 claim(사용자 권한) 추출.
+                .parseClaimsJws(token)
+                .getBody();
 
+        // 이메일 추출
+        String email = claims.getSubject();
+
+        // 사용자 정보 조회
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다: " + email));
+
+        // 권한 정보 추출
         Collection<? extends GrantedAuthority> authorities =
                 Arrays.stream(claims.get(AUTHORITIES_KEY).toString().split(","))
                         .map(SimpleGrantedAuthority::new)
                         .collect(Collectors.toList());
 
-        // 1. UserRepository를 주입받아 사용자 정보 조회
-        String username = claims.getSubject();
-        com.pbl.mapmo.domain.user.User user = userRepository.findByEmail(username)
-                .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다: " + username));
-
-        // 2. 찾은 User 엔티티로 CustomUserDetails 생성
-        CustomUserDetails principal = new CustomUserDetails(user);
+        // CustomUserDetails에 User 객체 포함
+        CustomUserDetails principal = new CustomUserDetails(user, authorities);
 
         return new UsernamePasswordAuthenticationToken(principal, token, authorities);
     }

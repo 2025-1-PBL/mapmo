@@ -1,6 +1,7 @@
 package com.pbl.mapmo.common.service;
 
 import com.pbl.mapmo.domain.user.User;
+import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -19,12 +20,24 @@ public class CustomUserDetails implements OAuth2User, UserDetails {
     /**
      * 사용자 엔티티
      */
+    @Getter
     private User user;
 
     /**
      * OAuth2 인증에서 제공하는 사용자 속성 정보
      */
     private Map<String, Object> attributes;
+
+    /**
+     * 권한 정보를 포함한 생성자
+     *
+     * @param user 사용자 엔티티
+     * @param authorities 사용자 권한 정보
+     */
+    public CustomUserDetails(User user, Collection<? extends GrantedAuthority> authorities) {
+        this.user = user;
+        // 필요한 경우 권한 정보를 저장하는 로직 추가
+    }
 
     /**
      * 일반 로그인을 위한 생성자

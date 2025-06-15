@@ -95,8 +95,9 @@ logging:
   level:
     root: INFO
     com.pbl.mapmo: DEBUG
-    org.hibernate.SQL: DEBUG
+    #org.hibernate.SQL: DEBUG
     org.springframework.security: DEBUG
-    org.springframework.data.redis: DEBUG
+    #org.springframework.data.redis: DEBUG
     com.pbl.mapmo.jwt: TRACE
-    org.hibernate.type.descriptor.sql: TRACE
+    #org.hibernate.type.descriptor.sql: TRACE
+    com.pbl.mapmo.domain.notification: DEBUG  # 알림 패키지의 로그 레벨 설정
