@@ -24,4 +24,10 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Integer> {
             @Param("lat") Double lat,
             @Param("lng") Double lng,
             @Param("distance") Double distance);
+
+    /**
+     * 특정 사용자의 위치 정보가 있는 일정 목록을 조회합니다.
+     */
+    @Query("SELECT s FROM Schedule s WHERE s.user.id = :userId AND s.latitude IS NOT NULL AND s.longitude IS NOT NULL")
+    List<Schedule> findSchedulesWithLocationByUserId(Integer userId);
 }

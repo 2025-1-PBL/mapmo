@@ -3,9 +3,14 @@ package com.pbl.mapmo.domain.notification;
 public enum NotificationType {
     NEW_ARTICLE,
     NEW_COMMENT,
+    ARTICLE_LIKE,
+    ARTICLE_DISLIKE,
+    FRIEND_REQUEST,
+    SCHEDULE_INVITATION,
     TEST,
     BLOCK_INVITATION,
     EVENT_REMINDER,
     SYSTEM_NOTIFICATION,
-    SCHEDULE_REMINDER
+    SCHEDULE_REMINDER,
+    LOCATION_PROXIMITY
 }

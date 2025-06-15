@@ -2,11 +2,12 @@ package com.pbl.mapmo.domain.articlecomment;
 
 import com.pbl.mapmo.domain.article.Article;
 import com.pbl.mapmo.domain.article.ArticleRepository;
+import com.pbl.mapmo.domain.user.UserRepository;
 import com.pbl.mapmo.domain.notification.NotificationMessage;
 import com.pbl.mapmo.domain.notification.NotificationService;
 import com.pbl.mapmo.domain.notification.NotificationType;
 import com.pbl.mapmo.domain.user.User;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,29 +17,47 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Service
-@RequiredArgsConstructor
 public class ArticleCommentService {
 
-    private final ArticleCommentRepository articleCommentRepository;
+    private final ArticleCommentRepository commentRepository;
     private final ArticleRepository articleRepository;
+    private final UserRepository userRepository;
     private final NotificationService notificationService;
     private final SimpMessageSendingOperations messagingTemplate;
 
+    @Autowired
+    public ArticleCommentService(ArticleCommentRepository commentRepository,
+                                 ArticleRepository articleRepository,
+                                 UserRepository userRepository,
+                                 NotificationService notificationService,
+                                 SimpMessageSendingOperations messagingTemplate) { // 생성자 매개변수 추가
+        this.commentRepository = commentRepository;
+        this.articleRepository = articleRepository;
+        this.userRepository = userRepository;
+        this.notificationService = notificationService;
+        this.messagingTemplate = messagingTemplate; // 필드 초기화
+    }
     @Transactional
-    public ArticleComment saveComment(ArticleComment comment, Integer articleId, User user) {
+    public ArticleComment createComment(ArticleComment comment, Integer articleId, Integer userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+
         Article article = articleRepository.findById(articleId)
                 .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
 
         comment.setArticle(article);
         comment.setUser(user);
-        comment.setCreatedDate(LocalDateTime.now());  // setCreatedAt -> setCreatedDate 변경
 
-        ArticleComment savedComment = articleCommentRepository.save(comment);
+        ArticleComment savedComment = commentRepository.save(comment);
 
-        // 게시글 작성자에게 실시간 알림 전송 (본인 댓글은 제외)
-        User articleAuthor = article.getUser();
-        if (!articleAuthor.getId().equals(user.getId())) {
-            sendRealTimeCommentNotification(articleAuthor, savedComment, article);
+        // 게시글 작성자에게 알림 전송 (자신의 게시글에는 알림이 가지 않도록 함)
+        if (!article.getUser().getId().equals(userId)) {
+            notificationService.createCommentNotification(
+                    article.getUser(),
+                    user,
+                    articleId.longValue(),
+                    savedComment.getId().longValue()
+            );
         }
 
         return savedComment;

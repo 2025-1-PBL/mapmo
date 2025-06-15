@@ -13,7 +13,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
+
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -128,15 +131,13 @@ public class ArticleController {
      */
     @PostMapping("/{articleId}/like")
     @Transactional
-    public ResponseEntity<ArticleDto.Response> likeArticle(@PathVariable Integer articleId) {
-        try {
-            Article article = articleService.likeArticle(articleId);
-            return ResponseEntity.ok(ArticleDto.Response.of(article));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.notFound().build();
-        }
-    }
+    public ResponseEntity<ArticleDto.Response> likeArticle(
+            @PathVariable Integer articleId,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
 
+        Article article = articleService.likeArticle(articleId, userDetails.getId());
+        return ResponseEntity.ok(ArticleDto.Response.of(article));
+    }
     /**
      * 게시글에 싫어요를 추가합니다.
      *
@@ -145,13 +146,21 @@ public class ArticleController {
      */
     @PostMapping("/{articleId}/dislike")
     @Transactional
-    public ResponseEntity<ArticleDto.Response> dislikeArticle(@PathVariable Integer articleId) {
-        try {
-            Article article = articleService.dislikeArticle(articleId);
-            return ResponseEntity.ok(ArticleDto.Response.of(article));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<ArticleDto.Response> dislikeArticle(
+            @PathVariable Integer articleId,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+
+        Article article = articleService.dislikeArticle(articleId, userDetails.getId());
+        return ResponseEntity.ok(ArticleDto.Response.of(article));
+    }
+
+    @GetMapping("/{articleId}/reaction")
+    public ResponseEntity<Map<String, Boolean>> getUserReaction(
+            @PathVariable Integer articleId,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+
+        Map<String, Boolean> reactions = articleService.getUserReaction(articleId, userDetails.getId());
+        return ResponseEntity.ok(reactions);
     }
 
     /**

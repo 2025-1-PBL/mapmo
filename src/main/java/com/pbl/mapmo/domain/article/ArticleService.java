@@ -1,5 +1,6 @@
 package com.pbl.mapmo.domain.article;
 
+import com.pbl.mapmo.domain.notification.NotificationService;
 import com.pbl.mapmo.domain.user.User;
 import com.pbl.mapmo.domain.user.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,7 +9,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -16,11 +19,20 @@ public class ArticleService {
 
     private final ArticleRepository articleRepository;
     private final UserRepository userRepository;
+    private final NotificationService notificationService; // 추가
 
     @Autowired
-    public ArticleService(ArticleRepository articleRepository, UserRepository userRepository) {
+    private ArticleLikeRepository articleLikeRepository;
+    @Autowired
+    private ArticleDislikeRepository articleDislikeRepository;
+
+    @Autowired
+    public ArticleService(ArticleRepository articleRepository,
+                          UserRepository userRepository,
+                          NotificationService notificationService) { // 생성자 수정
         this.articleRepository = articleRepository;
         this.userRepository = userRepository;
+        this.notificationService = notificationService;
     }
 
     /**
@@ -126,27 +138,99 @@ public class ArticleService {
      * @return 업데이트된 게시글
      */
     @Transactional
-    public Article likeArticle(Integer articleId) {
+    public Article likeArticle(Integer articleId, Integer userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+
         Article article = articleRepository.findById(articleId)
                 .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
 
-        article.setLikes(article.getLikes() + 1);
-        return articleRepository.save(article);
-    }
+        // 좋아요를 이미 눌렀는지 확인
+        boolean alreadyLiked = articleLikeRepository.existsByArticleAndUser(article, user);
 
-    /**
+        if (!alreadyLiked) {
+            // 싫어요가 있다면 제거
+            articleDislikeRepository.findByArticleAndUser(article, user)
+                    .ifPresent(dislike -> {
+                        articleDislikeRepository.delete(dislike);
+                        article.setDislikes(article.getDislikes() - 1);
+                    });
+
+            // 좋아요 추가
+            ArticleLike like = ArticleLike.builder()
+                    .article(article)
+                    .user(user)
+                    .build();
+
+            articleLikeRepository.save(like);
+            article.setLikes(article.getLikes() + 1);
+
+            // 게시글 작성자에게 알림 전송 (자신의 게시글에는 알림이 가지 않도록 함)
+            if (!article.getUser().getId().equals(userId)) {
+                notificationService.createArticleLikeNotification(article.getUser(), user, articleId.longValue());
+            }
+        }
+
+        return articleRepository.save(article);
+    }    /**
      * 게시글에 싫어요를 추가합니다.
      *
      * @param articleId 게시글 ID
      * @return 업데이트된 게시글
      */
     @Transactional
-    public Article dislikeArticle(Integer articleId) {
+    public Article dislikeArticle(Integer articleId, Integer userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+
         Article article = articleRepository.findById(articleId)
                 .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
 
-        article.setDislikes(article.getDislikes() + 1);
+        // 싫어요를 이미 눌렀는지 확인
+        boolean alreadyDisliked = articleDislikeRepository.existsByArticleAndUser(article, user);
+
+        if (!alreadyDisliked) {
+            // 좋아요가 있다면 제거
+            articleLikeRepository.findByArticleAndUser(article, user)
+                    .ifPresent(like -> {
+                        articleLikeRepository.delete(like);
+                        article.setLikes(article.getLikes() - 1);
+                    });
+
+            // 싫어요 추가
+            ArticleDislike dislike = ArticleDislike.builder()
+                    .article(article)
+                    .user(user)
+                    .build();
+
+            articleDislikeRepository.save(dislike);
+            article.setDislikes(article.getDislikes() + 1);
+
+            // 게시글 작성자에게 알림 전송 (자신의 게시글에는 알림이 가지 않도록 함)
+            if (!article.getUser().getId().equals(userId)) {
+                notificationService.createArticleDislikeNotification(article.getUser(), user, articleId.longValue());
+            }
+        }
+
         return articleRepository.save(article);
+    }
+
+    // ArticleService 클래스에 다음 메소드 추가
+    public Map<String, Boolean> getUserReaction(Integer articleId, Integer userId) {
+        Article article = articleRepository.findById(articleId)
+                .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
+        boolean liked = articleLikeRepository.existsByArticleAndUser(article, user);
+        boolean disliked = articleDislikeRepository.existsByArticleAndUser(article, user);
+
+        Map<String, Boolean> reactions = new HashMap<>();
+        reactions.put("liked", liked);
+        reactions.put("disliked", disliked);
+
+        return reactions;
     }
 
     /**

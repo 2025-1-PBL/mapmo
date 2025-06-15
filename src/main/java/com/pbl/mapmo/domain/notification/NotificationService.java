@@ -51,6 +51,117 @@ public class NotificationService {
     }
 
     /**
+     * 게시글 댓글에 대한 알림을 생성합니다.
+     */
+    @Transactional
+    public void createCommentNotification(User articleOwner, User commenter, Long articleId, Long commentId) {
+        if (articleOwner.getId().equals(commenter.getId())) {
+            return; // 자신의 게시글에 자신이 댓글을 달았을 경우 알림 생성 안함
+        }
+
+        String title = "새 댓글 알림";
+        String message = commenter.getName() + "님이 회원님의 게시글에 댓글을 남겼습니다.";
+
+        Notification notification = saveNotification(articleOwner, title, message,
+                NotificationType.NEW_COMMENT, articleId);
+
+        // 푸시 알림 전송
+        Map<String, String> data = Map.of(
+                "articleId", articleId.toString(),
+                "commentId", commentId.toString()
+        );
+
+        sendPushNotification(articleOwner, title, message,
+                NotificationType.NEW_COMMENT, articleId, data);
+    }
+
+    /**
+     * 게시글 좋아요에 대한 알림을 생성합니다.
+     */
+    @Transactional
+    public void createArticleLikeNotification(User articleOwner, User liker, Long articleId) {
+        if (articleOwner.getId().equals(liker.getId())) {
+            return; // 자신의 게시글에 자신이 좋아요를 눌렀을 경우 알림 생성 안함
+        }
+
+        String title = "게시글 좋아요 알림";
+        String message = liker.getName() + "님이 회원님의 게시글을 좋아합니다.";
+
+        Notification notification = saveNotification(articleOwner, title, message,
+                NotificationType.ARTICLE_LIKE, articleId);
+
+        // 푸시 알림 전송
+        Map<String, String> data = Map.of("articleId", articleId.toString());
+
+        sendPushNotification(articleOwner, title, message,
+                NotificationType.ARTICLE_LIKE, articleId, data);
+    }
+
+    /**
+     * 게시글 싫어요에 대한 알림을 생성합니다.
+     */
+    @Transactional
+    public void createArticleDislikeNotification(User articleOwner, User disliker, Long articleId) {
+        if (articleOwner.getId().equals(disliker.getId())) {
+            return; // 자신의 게시글에 자신이 싫어요를 눌렀을 경우 알림 생성 안함
+        }
+
+        String title = "게시글 싫어요 알림";
+        String message = disliker.getName() + "님이 회원님의 게시글에 싫어요를 표시했습니다.";
+
+        Notification notification = saveNotification(articleOwner, title, message,
+                NotificationType.ARTICLE_DISLIKE, articleId);
+
+        // 푸시 알림 전송
+        Map<String, String> data = Map.of("articleId", articleId.toString());
+
+        sendPushNotification(articleOwner, title, message,
+                NotificationType.ARTICLE_DISLIKE, articleId, data);
+    }
+
+    /**
+     * 친구 요청에 대한 알림을 생성합니다.
+     */
+    @Transactional
+    public void createFriendRequestNotification(User receiver, User sender, Long friendRequestId) {
+        String title = "새 친구 요청";
+        String message = sender.getName() + "님이 친구 요청을 보냈습니다.";
+
+        Notification notification = saveNotification(receiver, title, message,
+                NotificationType.FRIEND_REQUEST, friendRequestId);
+
+        // 푸시 알림 전송
+        Map<String, String> data = Map.of(
+                "friendRequestId", friendRequestId.toString(),
+                "senderId", sender.getId().toString()
+        );
+
+        sendPushNotification(receiver, title, message,
+                NotificationType.FRIEND_REQUEST, friendRequestId, data);
+    }
+
+    /**
+     * 공유 일정 초대에 대한 알림을 생성합니다.
+     */
+    @Transactional
+    public void createScheduleInvitationNotification(User receiver, User sender, Long scheduleId) {
+        String title = "일정 초대";
+        String message = sender.getName() + "님이 공유 일정에 초대했습니다.";
+
+        Notification notification = saveNotification(receiver, title, message,
+                NotificationType.SCHEDULE_INVITATION, scheduleId);
+
+        // 푸시 알림 전송
+        Map<String, String> data = Map.of(
+                "scheduleId", scheduleId.toString(),
+                "senderId", sender.getId().toString()
+        );
+
+        sendPushNotification(receiver, title, message,
+                NotificationType.SCHEDULE_INVITATION, scheduleId, data);
+    }
+
+    /**
      * 특정 사용자의 모든 알림을 조회합니다.
      *
      * @param user 알림을 조회할 사용자

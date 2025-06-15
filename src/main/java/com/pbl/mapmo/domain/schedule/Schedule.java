@@ -37,6 +37,9 @@ public class Schedule {
     @Column
     private Double longitude;
 
+    @Column(name = "marker-color", length = 20)
+    private String markerColor;
+
     @Column(name = "reminder_time")
     private LocalDateTime reminderTime;
 

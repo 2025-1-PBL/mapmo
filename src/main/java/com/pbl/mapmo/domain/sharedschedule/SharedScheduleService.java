@@ -1,5 +1,6 @@
 package com.pbl.mapmo.domain.sharedschedule;
 
+import com.pbl.mapmo.domain.notification.NotificationService;
 import com.pbl.mapmo.domain.schedule.Schedule;
 import com.pbl.mapmo.domain.sharedschedulemember.SharedScheduleMember;
 import com.pbl.mapmo.domain.sharedschedulememberid.SharedScheduleMemberId;
@@ -21,17 +22,20 @@ public class SharedScheduleService {
     private final SharedScheduleMemberRepository sharedScheduleMemberRepository;
     private final ScheduleRepository scheduleRepository;
     private final UserRepository userRepository;
+    private final NotificationService notificationService; // 추가
 
     @Autowired
     public SharedScheduleService(
             SharedScheduleRepository sharedScheduleRepository,
             SharedScheduleMemberRepository sharedScheduleMemberRepository,
             ScheduleRepository scheduleRepository,
-            UserRepository userRepository) {
+            UserRepository userRepository,
+            NotificationService notificationService) { // 생성자 파라미터 추가
         this.sharedScheduleRepository = sharedScheduleRepository;
         this.sharedScheduleMemberRepository = sharedScheduleMemberRepository;
         this.scheduleRepository = scheduleRepository;
         this.userRepository = userRepository;
+        this.notificationService = notificationService; // 초기화
     }
 
     /**
@@ -89,6 +93,9 @@ public class SharedScheduleService {
         SharedSchedule sharedSchedule = sharedScheduleRepository.findById(sharedScheduleId)
                 .orElseThrow(() -> new RuntimeException("공유 일정을 찾을 수 없습니다."));
 
+        // SharedSchedule 객체에서 마스터 사용자 정보 가져오기
+        User masterUser = sharedSchedule.getUserMaster();
+
         // 권한 확인 (공유 일정 소유자만 멤버 추가 가능)
         if (!sharedSchedule.getUserMaster().getId().equals(masterId)) {
             throw new RuntimeException("이 공유 일정에 멤버를 추가할 권한이 없습니다.");
@@ -105,12 +112,22 @@ public class SharedScheduleService {
         }
 
         // 공유 일정 멤버 생성
+        SharedScheduleMemberId id = new SharedScheduleMemberId(sharedScheduleId, memberUserId);
         SharedScheduleMember member = new SharedScheduleMember();
-        member.setId(memberId);
+        member.setId(id);
         member.setSharedSchedule(sharedSchedule);
         member.setUserMember(memberUser);
 
-        return sharedScheduleMemberRepository.save(member);
+        SharedScheduleMember savedMember = sharedScheduleMemberRepository.save(member);
+
+        // 알림 전송 코드 추가
+        notificationService.createScheduleInvitationNotification(
+                memberUser, // 수신자 (초대된 멤버)
+                masterUser, // 발신자 (마스터)
+                sharedSchedule.getSchedule().getId().longValue() // 일정 ID (Long 타입으로 변환)
+        );
+
+        return savedMember;
     }
 
     /**

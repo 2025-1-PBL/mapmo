@@ -1,5 +1,6 @@
 package com.pbl.mapmo.domain.friend;
 
+import com.pbl.mapmo.domain.notification.NotificationService;
 import com.pbl.mapmo.domain.user.User;
 import com.pbl.mapmo.domain.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,11 +15,14 @@ public class FriendService {
 
     private final FriendRepository friendRepository;
     private final UserService userService;
+    private final NotificationService notificationService;
 
     @Autowired
-    public FriendService(FriendRepository friendRepository, UserService userService) {
+    public FriendService(FriendRepository friendRepository, UserService userService,
+                         NotificationService notificationService) { // 생성자 주입
         this.friendRepository = friendRepository;
         this.userService = userService;
+        this.notificationService = notificationService;
     }
 
     /**
@@ -53,6 +57,15 @@ public class FriendService {
                 .friend(friend)
                 .status(Friend.FriendStatus.PENDING)
                 .build();
+
+        Friend savedFriendRequest = friendRepository.save(friendRequest);
+
+        // 알림 보내기 (수정된 부분)
+        notificationService.createFriendRequestNotification(
+                friend,  // 요청을 받는 사용자 (receiver)
+                user,    // 요청을 보낸 사용자 (sender)
+                savedFriendRequest.getId().longValue() // Integer를 Long으로 변환
+        );
 
         return friendRepository.save(friendRequest);
     }
