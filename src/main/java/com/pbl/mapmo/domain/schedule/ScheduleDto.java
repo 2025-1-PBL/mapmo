@@ -21,7 +21,7 @@ public class ScheduleDto {
     public static class Request {
         @NotBlank(message = "제목은 필수 입력값입니다")
         private String title;
-
+        private String markerColor;
         private String content;
         private String location;
         private Double latitude;
@@ -41,6 +41,7 @@ public class ScheduleDto {
                     .longitude(longitude)
                     .date(date)
                     .isShared(isShared != null ? isShared : false)
+                    .markerColor(markerColor)
                     .user(user)
                     .build();
         }
@@ -57,6 +58,7 @@ public class ScheduleDto {
         private Double longitude;
         private LocalDateTime date;
         private Boolean isShared;
+        private String markerColor;
         private UserDto.Response user;
         private SharedScheduleDto.Response sharedSchedule;
 
@@ -70,6 +72,7 @@ public class ScheduleDto {
                     .longitude(schedule.getLongitude())
                     .date(schedule.getDate())
                     .isShared(schedule.getIsShared())
+                    .markerColor(schedule.getMarkerColor())
                     .user(UserDto.Response.of(schedule.getUser()))
                     .sharedSchedule(schedule.getSharedSchedule() != null ?
                             SharedScheduleDto.Response.of(schedule.getSharedSchedule()) : null)

@@ -136,6 +136,24 @@ public class ScheduleController {
         }
     }
 
+    @Operation(summary = "위치 정보가 있는 일정 조회")
+    @GetMapping("/user/{userId}/locations")
+    public ResponseEntity<List<Schedule>> getSchedulesWithLocation(@PathVariable Integer userId) {
+        List<Schedule> schedules = scheduleService.getSchedulesWithLocation(userId);
+        return ResponseEntity.ok(schedules);
+    }
+
+    @Operation(summary = "일정 마커 색상 설정")
+    @PatchMapping("/{scheduleId}/marker-color")
+    public ResponseEntity<Schedule> updateMarkerColor(
+            @PathVariable Integer scheduleId,
+            @RequestBody Map<String, String> colorData,
+            @RequestParam Integer userId) {
+        String color = colorData.get("color");
+        Schedule updated = scheduleService.updateMarkerColor(scheduleId, color, userId);
+        return ResponseEntity.ok(updated);
+    }
+
     /**
      * 특정 위치 주변의 일정 검색
      */
@@ -156,18 +174,12 @@ public class ScheduleController {
             @PathVariable Integer scheduleId,
             @RequestBody Map<String, Object> reminderData,
             @RequestParam Integer userId) {
-
         Boolean enabled = (Boolean) reminderData.get("enabled");
-        String reminderTimeStr = (String) reminderData.get("reminderTime");
         LocalDateTime reminderTime = null;
-
-        if (reminderTimeStr != null) {
-            reminderTime = LocalDateTime.parse(reminderTimeStr);
+        if (reminderData.containsKey("reminderTime") && reminderData.get("reminderTime") != null) {
+            reminderTime = LocalDateTime.parse((String) reminderData.get("reminderTime"));
         }
-
-        Schedule updatedSchedule = scheduleService.updateScheduleReminder(
-                scheduleId, enabled, reminderTime, userId);
-
-        return ResponseEntity.ok(updatedSchedule);
+        Schedule updated = scheduleService.updateScheduleReminder(scheduleId, enabled, reminderTime, userId);
+        return ResponseEntity.ok(updated);
     }
 }

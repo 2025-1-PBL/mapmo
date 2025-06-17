@@ -33,6 +33,44 @@ public class ScheduleService {
     }
 
     /**
+     * 위치 정보가 있는 일정을 조회합니다.
+     *
+     * @param userId 사용자 ID
+     * @return 위치 정보가 있는 일정 목록
+     */
+    public List<Schedule> getSchedulesWithLocation(Integer userId) {
+        return scheduleRepository.findSchedulesWithLocationByUserId(userId);
+    }
+
+    /**
+     * 일정 ID와 사용자 ID를 기반으로 일정을 조회합니다.
+     * 사용자가 해당 일정에 접근할 권한이 없으면 예외를 발생시킵니다.
+     *
+     * @param scheduleId 일정 ID
+     * @param userId 사용자 ID
+     * @return 조회된 일정
+     * @throws RuntimeException 일정이 존재하지 않거나 사용자에게 권한이 없는 경우
+     */
+    private Schedule getScheduleByIdAndUserId(Integer scheduleId, Integer userId) {
+        Schedule schedule = scheduleRepository.findById(scheduleId)
+                .orElseThrow(() -> new RuntimeException("일정을 찾을 수 없습니다: " + scheduleId));
+
+        // 일정의 소유자가 요청한 사용자인지 확인
+        if (!schedule.getUser().getId().equals(userId)) {
+            throw new RuntimeException("이 일정에 대한 권한이 없습니다.");
+        }
+
+        return schedule;
+    }
+
+    @Transactional
+    public Schedule updateMarkerColor(Integer scheduleId, String color, Integer userId) {
+        Schedule schedule = getScheduleByIdAndUserId(scheduleId, userId);
+        schedule.setMarkerColor(color);
+        return scheduleRepository.save(schedule);
+    }
+
+    /**
      * 특정 일정을 ID로 조회합니다.
      *
      * @param scheduleId 일정 ID
