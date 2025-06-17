@@ -11,6 +11,7 @@ import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -121,16 +122,20 @@ public class NotificationController {
      * 모바일 디바이스에서 푸시 알림을 받기 위한 설정입니다.
      *
      * @param authentication 현재 인증 정보
-     * @param payload FCM 토큰을 포함한 요청 데이터
+     * @param request FCM 토큰을 포함한 요청 데이터
      * @return 성공 응답
      */
-    @PutMapping("/token")
-    public ResponseEntity<?> updateFcmToken(Authentication authentication,
-                                            @RequestBody Map<String, String> payload) {
-        // FCM 토큰 업데이트 로직
+    @PostMapping("/fcm-token")
+    public ResponseEntity<?> updateFcmToken(Authentication authentication, @RequestBody FcmTokenRequest request) {
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        User user = userRepository.findById(userDetails.getId())
+                .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
+
+        user.setFcmToken(request.getFcmToken());
+        userRepository.save(user);
+
         return ResponseEntity.ok().build();
     }
-
     /**
      * WebSocket 연결 설정을 처리합니다.
      * 클라이언트가 실시간 알림을 받기 위해 연결할 때 호출됩니다.
